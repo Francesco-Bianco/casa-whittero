@@ -1,1 +1,1148 @@
-# casa-whittero
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<link rel="apple-touch-icon" id="appIcon" href="">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%232C1810'/><text x='50' y='58' font-size='42' font-family='Arial Black' font-weight='900' fill='%23F59E0B' text-anchor='middle'>CW</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Casa Whittero">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Whittero</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: #FDF6EC; color: #2C1810; min-height: 100vh; }
+
+  header { background: #2C1810; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header-title .subtitle { color: #F59E0B; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 4px; }
+  .header-title h1 { color: #FDF6EC; font-size: 24px; font-weight: 400; letter-spacing: 1px; }
+  .sync-status { font-size: 12px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px; }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; flex-shrink: 0; }
+  .sync-dot.ok { background: #4ade80; }
+  .sync-dot.syncing { background: #F59E0B; animation: pulse 1s infinite; }
+  .sync-dot.error { background: #e53e3e; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  nav button { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 13px; transition: all 0.2s; }
+  nav button.active { background: #F59E0B; color: #2C1810; font-weight: 700; }
+  nav button:not(.active) { background: rgba(255,255,255,0.1); color: #FDF6EC; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+  .view { display: none; } .view.active { display: block; }
+
+  .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .page-header h2 { font-size: 24px; font-weight: 600; color: #2C1810; }
+  .page-header p { color: #888; font-size: 14px; margin-top: 4px; }
+  .page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn-primary { padding: 10px 22px; border: none; border-radius: 8px; background: #2C1810; color: #F59E0B; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; }
+  .btn-secondary { padding: 8px 18px; border: 1px solid #DDD; border-radius: 6px; background: transparent; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 13px; color: #666; }
+  .btn-icon { padding: 8px 14px; border: 1px solid #DDD; border-radius: 6px; background: transparent; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 13px; color: #666; }
+  .btn-icon:hover { background: #F5F0EA; }
+
+  .legend { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .day-card { background: #FFF; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #EEE6DB; margin-bottom: 16px; }
+  .day-name { font-weight: 700; font-size: 18px; margin-bottom: 14px; color: #2C1810; }
+  .meals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 600px) { .meals-grid { grid-template-columns: 1fr; } }
+
+  .meal-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; font-weight: 600; }
+  .meal-slot-empty { width: 100%; min-height: 60px; border: 1.5px dashed #DDD; border-radius: 8px; background: transparent; cursor: pointer; color: #BBB; font-size: 22px; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+  .meal-slot-filled { background: #FFF8F0; border-radius: 8px; padding: 10px 12px; position: relative; }
+  .meal-row { display: flex; align-items: center; gap: 8px; }
+  .recipe-emoji { font-size: 20px; }
+  .recipe-info { flex: 1; min-width: 0; }
+  .recipe-name { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #2C1810; }
+  .recipe-name.clickable { cursor: pointer; }
+  .recipe-name.clickable:hover { text-decoration: underline; }
+  .recipe-time { font-size: 13px; color: #888; }
+  .remove-btn { position: absolute; top: 6px; right: 6px; background: none; border: none; cursor: pointer; color: #CCC; font-size: 14px; line-height: 1; padding: 2px; }
+  .remove-btn:hover { color: #e53e3e; }
+
+  .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-btn { padding: 9px 18px; border-radius: 20px; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 14px; transition: all 0.15s; }
+  .filter-btn.active { background: #2C1810; color: #F59E0B; }
+  .filter-btn:not(.active) { background: #EEE6DB; color: #555; }
+
+  .search-input { width: 100%; padding: 13px 18px; border-radius: 10px; border: 1px solid #DDD; font-family: 'Nunito', sans-serif; font-size: 16px; margin-bottom: 24px; background: #FFF; outline: none; color: #2C1810; }
+
+  .recipes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .recipe-card { background: #FFF; border-radius: 12px; padding: 20px; cursor: pointer; border: 1px solid #EEE6DB; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.05); position: relative; }
+  .recipe-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .recipe-card .card-emoji { font-size: 44px; margin-bottom: 12px; }
+  .recipe-card .cat { font-size: 11px; color: #F59E0B; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .recipe-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; padding-right: 60px; color: #2C1810; }
+  .recipe-card .meta { font-size: 13px; color: #666; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; }
+  .tag { font-size: 13px; background: #FFF8F0; padding: 3px 10px; border-radius: 10px; color: #A0522D; }
+  .delete-recipe-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px; border-radius: 4px; color: #CCC; transition: color 0.15s; }
+  .delete-recipe-btn:hover { color: #e53e3e; }
+
+  .form-card { background: #FFF; border-radius: 12px; padding: 24px; margin-bottom: 28px; border: 1px solid #EEE6DB; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-full { grid-column: 1 / -1; }
+  .form-group label { font-size: 13px; color: #666; display: block; margin-bottom: 5px; font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border-radius: 7px; border: 1px solid #DDD; font-family: 'Nunito', sans-serif; font-size: 15px; background: #FFF; outline: none; color: #2C1810; }
+  .form-group textarea { resize: vertical; }
+  .form-actions { display: flex; gap: 10px; margin-top: 16px; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #FDF6EC; border-radius: 16px; padding: 28px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal-sm { max-width: 540px; } .modal-lg { max-width: 560px; }
+
+  .pick-header { margin-bottom: 20px; }
+  .pick-header .sub { color: #888; font-size: 12px; margin-bottom: 4px; }
+  .pick-header h3 { font-size: 18px; }
+  .pick-list { display: grid; gap: 10px; margin-top: 12px; }
+  .pick-item { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border: 1px solid #E8DDD0; border-radius: 10px; background: #FFF; cursor: pointer; text-align: left; transition: all 0.15s; font-family: 'Nunito', sans-serif; width: 100%; }
+  .pick-item:hover { background: #FFF8F0; }
+  .pi-emoji { font-size: 30px; } .pi-name { font-weight: 600; font-size: 16px; color: #2C1810; } .pi-meta { font-size: 14px; color: #888; }
+
+  .detail-emoji { font-size: 60px; text-align: center; margin-bottom: 16px; }
+  .detail-badge { display: inline-block; background: #2C1810; color: #F59E0B; padding: 3px 12px; border-radius: 20px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+  .detail-header { text-align: center; margin-bottom: 24px; }
+  .detail-header h2 { margin: 12px 0 4px; font-size: 26px; color: #2C1810; }
+  .detail-header .time { color: #888; font-size: 14px; }
+  .detail-section { margin-bottom: 20px; }
+  .detail-section h4 { color: #F59E0B; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; margin-bottom: 10px; }
+  .detail-section ul { padding-left: 20px; line-height: 2; font-size: 16px; }
+  .detail-section p { line-height: 1.8; font-size: 16px; color: #2C1810; }
+
+  /* LISTA DELLA SPESA */
+  .spesa-section { margin-bottom: 28px; }
+  .spesa-section h4 { font-size: 15px; color: #2C1810; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #EEE6DB; }
+  .spesa-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #F0EAE0; }
+  .spesa-item:last-child { border-bottom: none; }
+  .spesa-item input[type=checkbox] { width: 22px; height: 22px; accent-color: #2C1810; cursor: pointer; flex-shrink: 0; }
+  .spesa-item label { font-size: 17px; cursor: pointer; flex: 1; color: #2C1810; line-height: 1.4; }
+  .spesa-item label.checked { text-decoration: line-through; color: #BBB; }
+  .spesa-item .del-spesa { background: none; border: none; cursor: pointer; color: #CCC; font-size: 18px; padding: 4px 6px; flex-shrink: 0; }
+  .spesa-item .del-spesa:hover { color: #e53e3e; }
+  .spesa-add-row { display: flex; gap: 8px; margin-top: 20px; }
+  .spesa-add-row input { flex: 1; padding: 12px 16px; border-radius: 10px; border: 1px solid #DDD; font-family: 'Nunito', sans-serif; font-size: 16px; outline: none; color: #2C1810; }
+
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2C1810; color: #F59E0B; padding: 12px 28px; border-radius: 40px; font-size: 14px; z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: none; white-space: nowrap; }
+  .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #AAA; }
+  .empty-state .e-emoji { font-size: 48px; margin-bottom: 12px; }
+  .loading-screen { position: fixed; inset: 0; background: #FDF6EC; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 16px; }
+  .loading-screen .l-emoji { font-size: 56px; }
+  .loading-screen p { color: #888; font-size: 15px; }
+</style>
+
+<script>
+(function() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 180; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  // Background
+  ctx.fillStyle = '#2C1810';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 180, 180, 36);
+  ctx.fill();
+  // Text
+  ctx.fillStyle = '#F59E0B';
+  ctx.font = 'bold 72px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('CW', 90, 90);
+  // Set as apple touch icon
+  const link = document.getElementById('appIcon');
+  if (link) link.href = canvas.toDataURL('image/png');
+})();
+</script>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="l-emoji">🍽️</div>
+  <p>Caricamento in corso...</p>
+</div>
+
+<header>
+  <div class="header-title">
+    <div class="subtitle">Casa Whittero</div>
+    <h1>La mia casa</h1>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+    <div class="sync-status"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Connessione...</span></div>
+    <nav>
+      <button class="active" id="navMenu">📅 Menù</button>
+      <button id="navRicette">📖 Ricette</button>
+      <button id="navSpesa">🛒 Lista Spesa</button>
+      <button id="navTodo">✅ To Do</button>
+    </nav>
+  </div>
+</header>
+
+<div id="toast"></div>
+
+<!-- MODAL: Scegli cosa aggiungere -->
+<div class="modal-overlay" id="pickModal">
+  <div class="modal modal-sm">
+    <div class="pick-header">
+      <div class="sub" id="pickSub"></div>
+      <h3 id="pickTitle"></h3>
+    </div>
+    <div style="display:flex;margin-bottom:16px;border:1px solid #DDD;border-radius:8px;overflow:hidden">
+      <button id="tabFree" style="flex:1;padding:9px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px;background:#2C1810;color:#F59E0B;font-weight:700">✏️ Scrivi nome</button>
+      <button id="tabRecipes" style="flex:1;padding:9px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px;background:#F5F0EA;color:#666">📖 Dalle ricette</button>
+    </div>
+    <div id="paneFree">
+      <div style="display:flex;gap:8px">
+        <input id="freeNameInput" class="search-input" placeholder="Es. Pizza, Zuppa di verdure..." style="margin-bottom:0;flex:1">
+        <button class="btn-primary" id="btnAssignFree">Aggiungi</button>
+      </div>
+      <p style="font-size:12px;color:#AAA;margin-top:10px">Premi Invio o clicca Aggiungi per inserire il piatto nel menù.</p>
+    </div>
+    <div id="paneRecipes" style="display:none">
+      <input class="search-input" id="pickSearch" placeholder="Cerca ricetta..." style="margin-bottom:0">
+      <div class="pick-list" id="pickList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Dettaglio ricetta -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal modal-lg">
+    <div class="detail-emoji" id="detailEmoji"></div>
+    <div class="detail-header">
+      <span class="detail-badge" id="detailCat"></span>
+      <h2 id="detailName"></h2>
+      <div class="time" id="detailTime"></div>
+    </div>
+    <div class="detail-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h4 style="margin:0">Ingredienti</h4>
+        <div style="display:flex;align-items:center;gap:10px;background:#FFF;border:1px solid #DDD;border-radius:20px;padding:4px 12px">
+          <button id="detailPersoneMinus" style="background:none;border:none;cursor:pointer;font-size:18px;color:#2C1810;padding:0;line-height:1">−</button>
+          <span style="font-size:13px;min-width:60px;text-align:center">👤 <span id="detailPersoneVal">4</span> pers.</span>
+          <button id="detailPersonePlus" style="background:none;border:none;cursor:pointer;font-size:18px;color:#2C1810;padding:0;line-height:1">+</button>
+        </div>
+      </div>
+      <ul id="detailIngredients"></ul>
+    </div>
+    <div class="detail-section"><h4>Preparazione</h4><p id="detailInstructions"></p></div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn-primary" id="btnConfirmPersone" style="flex:1">✓ Salva porzioni e chiudi</button>
+      <button class="btn-secondary" id="btnCloseDetail" style="flex:1">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Conferma -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">🗑️</div>
+    <h3 id="confirmMsg" style="font-size:17px;font-weight:400;margin-bottom:24px;line-height:1.5"></h3>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn-primary" id="confirmYes" style="background:#e53e3e;color:#fff">Elimina</button>
+      <button class="btn-secondary" id="confirmNo">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Anteprima stampa -->
+<div class="modal-overlay" id="printModal">
+  <div class="modal modal-lg" style="max-width:620px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="font-size:17px">Anteprima stampa</h3>
+      <button id="btnClosePrint" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888">✕</button>
+    </div>
+    <div style="background:#FFF;border-radius:10px;padding:24px;border:1px solid #EEE;margin-bottom:20px;font-family:'Nunito',sans-serif;line-height:1.7" id="printContent"></div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="btn-primary" id="btnDoPrint" style="flex:1">📋 Copia testo</button>
+      <button class="btn-secondary" id="btnClosePrint2" style="flex:1">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- MENÙ -->
+  <div class="view active" id="view-menu">
+    <div class="page-header">
+      <div><h2>Menù della Settimana</h2><p>Clicca su un pasto per aggiungere una ricetta</p></div>
+      <div class="page-actions">
+        <button class="btn-icon" id="btnPrint">🖨️ Stampa</button>
+        <button class="btn-icon" id="btnGenSpesa">🛒 Genera lista spesa</button>
+        <button class="btn-secondary" id="btnClearMenu">Svuota menù</button>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>☀️ Colazione</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>🌤️ Pranzo</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>🌙 Cena</div>
+    </div>
+    <div id="menuContainer"></div>
+  </div>
+
+  <!-- RICETTE -->
+  <div class="view" id="view-ricette">
+    <div class="page-header">
+      <div><h2>Archivio Ricette</h2><p id="recipeCount"></p></div>
+      <button class="btn-primary" id="btnToggleForm">+ Nuova Ricetta</button>
+    </div>
+    <div class="form-card" id="recipeForm" style="display:none">
+      <h3 style="margin-bottom:20px;font-size:17px">✏️ Nuova Ricetta</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Nome ricetta *</label><input id="fName" placeholder="es. Pasta al pomodoro"></div>
+        <div class="form-group"><label>Categoria</label>
+          <select id="fCat"><option>Antipasti</option><option>Primi</option><option>Secondi</option><option>Contorni</option><option>Dessert</option><option>Colazione</option></select>
+        </div>
+        <div class="form-group"><label>Tempo (minuti)</label><input id="fTime" type="number" placeholder="30"></div>
+        <div class="form-group"><label>Persone (porzioni base)</label><input id="fPersone" type="number" placeholder="4" min="1"></div>
+        <div class="form-group"><label>Emoji</label><input id="fEmoji" placeholder="🍽️" style="font-size:20px"></div>
+        <div class="form-group form-full">
+          <label>Ingredienti</label>
+          <div id="ingRows" style="display:grid;gap:8px;margin-bottom:8px"></div>
+          <button type="button" id="btnAddIngRow" class="btn-secondary" style="font-size:12px;padding:6px 14px">+ Aggiungi ingrediente</button>
+        </div>
+        <div class="form-group form-full"><label>Preparazione</label><textarea id="fInstructions" rows="3"></textarea></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" id="btnSaveRecipe">Salva Ricetta</button>
+        <button class="btn-secondary" id="btnCancelForm">Annulla</button>
+      </div>
+    </div>
+    <div class="filters" id="filtersContainer"></div>
+    <input class="search-input" id="recipeSearch" placeholder="🔍 Cerca una ricetta...">
+    <div class="recipes-grid" id="recipesGrid"></div>
+  </div>
+
+  <!-- LISTA SPESA -->
+  <div class="view" id="view-spesa">
+    <div class="page-header">
+      <div><h2>Lista della Spesa</h2><p id="spesaCount"></p></div>
+      <div class="page-actions">
+        <button class="btn-icon" id="btnPrintSpesa">🖨️ Stampa</button>
+        <button class="btn-secondary" id="btnClearSpesa">Svuota lista</button>
+      </div>
+    </div>
+    <div id="spesaContainer"></div>
+    <div class="spesa-add-row">
+      <input id="spesaNewItem" placeholder="Aggiungi articolo manualmente...">
+      <button class="btn-primary" id="btnAddSpesa">Aggiungi</button>
+    </div>
+  </div>
+
+  <!-- TO DO LIST -->
+  <div class="view" id="view-todo">
+    <div class="page-header">
+      <div><h2>To Do List</h2><p id="todoCount"></p></div>
+      <div class="page-actions">
+        <button class="btn-secondary" id="btnClearTodoDone">Rimuovi completati</button>
+        <button class="btn-secondary" id="btnClearTodo">Svuota tutto</button>
+      </div>
+    </div>
+    <div id="todoContainer"></div>
+    <div class="spesa-add-row" style="margin-top:20px">
+      <input id="todoNewItem" placeholder="Aggiungi lavoro da fare...">
+      <button class="btn-primary" id="btnAddTodo">Aggiungi</button>
+    </div>
+  </div>
+</main>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBfql3I39EURXmWHeT9aAblazfe8SwjHzg",
+  authDomain: "menu-settimanale-7d2f3.firebaseapp.com",
+  projectId: "menu-settimanale-7d2f3",
+  storageBucket: "menu-settimanale-7d2f3.firebasestorage.app",
+  messagingSenderId: "419181618919",
+  appId: "1:419181618919:web:787dd4169b2eb29de96442"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ── COSTANTI ──
+const DAYS = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
+const MEALS = ["Colazione","Pranzo","Cena"];
+const CATEGORIES = ["Tutti","Antipasti","Primi","Secondi","Contorni","Dessert","Colazione"];
+const MEAL_COLOR = { Colazione:"#F59E0B", Pranzo:"#10B981", Cena:"#6366F1" };
+const MEAL_ICON = { Colazione:"☀️", Pranzo:"🌤️", Cena:"🌙" };
+
+const DEFAULT_RECIPES = [
+  { id:1, name:"Pasta al Pomodoro", category:"Primi", time:20, persone:4, ingredients:[{name:"pasta",qty:"320g"},{name:"pomodori",qty:"400g"},{name:"basilico",qty:"q.b."},{name:"olio",qty:"3 cucchiai"}], instructions:"Cuocere la pasta. Preparare il sugo con pomodori freschi, basilico e olio d'oliva.", emoji:"🍝" },
+  { id:2, name:"Risotto ai Funghi", category:"Primi", time:35, persone:4, ingredients:[{name:"riso",qty:"320g"},{name:"funghi porcini",qty:"200g"},{name:"cipolla",qty:"1"},{name:"vino bianco",qty:"100ml"},{name:"brodo",qty:"1l"}], instructions:"Soffriggere la cipolla, aggiungere il riso, sfumare con vino e aggiungere i funghi.", emoji:"🍄" },
+  { id:3, name:"Pollo alla Cacciatora", category:"Secondi", time:50, persone:4, ingredients:[{name:"pollo",qty:"1kg"},{name:"pomodori",qty:"300g"},{name:"olive",qty:"100g"},{name:"capperi",qty:"2 cucchiai"},{name:"vino rosso",qty:"150ml"}], instructions:"Rosolare il pollo, aggiungere pomodori, olive e capperi. Cuocere a fuoco lento.", emoji:"🍗" },
+  { id:4, name:"Insalata Caprese", category:"Antipasti", time:10, persone:2, ingredients:[{name:"mozzarella",qty:"250g"},{name:"pomodori",qty:"3"},{name:"basilico",qty:"q.b."},{name:"olio",qty:"2 cucchiai"}], instructions:"Disporre a strati mozzarella e pomodori, condire con olio e basilico.", emoji:"🥗" },
+  { id:5, name:"Tiramisù", category:"Dessert", time:30, persone:6, ingredients:[{name:"savoiardi",qty:"200g"},{name:"mascarpone",qty:"500g"},{name:"uova",qty:"4"},{name:"caffè",qty:"200ml"},{name:"cacao",qty:"q.b."}], instructions:"Montare uova e zucchero, aggiungere mascarpone. Inzuppare i savoiardi nel caffè.", emoji:"🍮" },
+  { id:6, name:"Bruschetta al Pomodoro", category:"Antipasti", time:10, persone:4, ingredients:[{name:"pane",qty:"4 fette"},{name:"pomodori",qty:"2"},{name:"aglio",qty:"1 spicchio"},{name:"basilico",qty:"q.b."}], instructions:"Tostare il pane, strofinare con aglio e condire con pomodori e basilico.", emoji:"🥖" },
+  { id:7, name:"Frittata di Verdure", category:"Secondi", time:20, persone:4, ingredients:[{name:"uova",qty:"4"},{name:"zucchine",qty:"2"},{name:"peperoni",qty:"1"},{name:"cipolle",qty:"1"}], instructions:"Saltare le verdure, aggiungere le uova sbattute e cuocere in padella.", emoji:"🍳" },
+  { id:8, name:"Pancakes con Miele", category:"Colazione", time:15, persone:4, ingredients:[{name:"farina",qty:"200g"},{name:"latte",qty:"250ml"},{name:"uova",qty:"2"},{name:"burro",qty:"30g"},{name:"miele",qty:"q.b."}], instructions:"Mescolare farina, latte e uova. Cuocere in padella e servire con miele.", emoji:"🥞" },
+];
+
+// ── STATO ──
+let recipes = [];
+let menu = makeEmptyMenu();
+let spesa = [];
+let personeMap = {};
+let todo = [];
+let filterCat = "Tutti";
+let pickTarget = null;
+let saveTimer = null;
+
+function makeEmptyMenu() {
+  const m = {};
+  DAYS.forEach(d => { m[d] = {}; MEALS.forEach(ml => m[d][ml] = []); });
+  return m;
+}
+
+// ── SYNC STATUS ──
+function setSyncStatus(status, label) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  dot.className = 'sync-dot ' + status;
+  lbl.textContent = label;
+}
+
+// ── FIREBASE SAVE (debounced) ──
+async function save() {
+  setSyncStatus('syncing', 'Salvataggio...');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try {
+      await setDoc(doc(db, 'cucina', 'data'), { recipes, menu, spesa, todo, personeMap });
+      setSyncStatus('ok', 'Sincronizzato ✓');
+    } catch(e) {
+      console.error(e);
+      setSyncStatus('error', 'Errore sync');
+    }
+  }, 800);
+}
+
+// ── FIREBASE LOAD ──
+async function loadFromFirebase() {
+  try {
+    const snap = await getDoc(doc(db, 'cucina', 'data'));
+    if (snap.exists()) {
+      const data = snap.data();
+      recipes = (data.recipes || []).map(r => ({
+        ...r,
+        ingredients: (r.ingredients || []).map(i => typeof i === 'string' ? {name:i, qty:''} : i)
+      }));
+      menu = data.menu || makeEmptyMenu();
+      // Migrate old single-recipe slots to arrays
+      DAYS.forEach(d => { if (!menu[d]) menu[d] = {}; MEALS.forEach(ml => {
+        if (!menu[d][ml]) menu[d][ml] = [];
+        else if (!Array.isArray(menu[d][ml])) menu[d][ml] = [menu[d][ml]];
+      }); });
+      spesa = data.spesa || [];
+      todo = data.todo || [];
+      personeMap = data.personeMap || {};
+    } else {
+      // First time: load defaults
+      recipes = DEFAULT_RECIPES;
+      menu = makeEmptyMenu();
+      spesa = [];
+      todo = [];
+      personeMap = {};
+      await save();
+    }
+    setSyncStatus('ok', 'Sincronizzato ✓');
+  } catch(e) {
+    console.error(e);
+    setSyncStatus('error', 'Errore connessione');
+    // Fallback to localStorage
+    recipes = JSON.parse(localStorage.getItem('cucina_recipes') || 'null') || DEFAULT_RECIPES;
+    menu = JSON.parse(localStorage.getItem('cucina_menu') || 'null') || makeEmptyMenu();
+    spesa = JSON.parse(localStorage.getItem('cucina_spesa') || '[]');
+    personeMap = JSON.parse(localStorage.getItem('cucina_persone') || '{}');
+  }
+}
+
+// ── REAL-TIME LISTENER ──
+function startRealtimeSync() {
+  onSnapshot(doc(db, 'cucina', 'data'), (snap) => {
+    if (!snap.exists()) return;
+    const data = snap.data();
+    recipes = (data.recipes || []).map(r => ({
+      ...r,
+      ingredients: (r.ingredients || []).map(i => typeof i === 'string' ? {name:i, qty:''} : i)
+    }));
+    menu = data.menu || makeEmptyMenu();
+    spesa = data.spesa || [];
+    personeMap = data.personeMap || {};
+    setSyncStatus('ok', 'Sincronizzato ✓');
+    // Re-render current view
+    const active = document.querySelector('.view.active');
+    if (active) {
+      if (active.id === 'view-menu') renderMenu();
+      if (active.id === 'view-ricette') { renderFilters(); renderRecipes(); }
+      if (active.id === 'view-spesa') renderSpesa();
+      if (active.id === 'view-todo') renderTodo();
+    }
+  }, (err) => {
+    console.error(err);
+    setSyncStatus('error', 'Errore connessione');
+  });
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.style.display = 'none', 2500);
+}
+
+// ── CONFIRM ──
+function showConfirm(msg, onYes) {
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmModal').classList.add('open');
+  document.getElementById('confirmYes').onclick = () => { document.getElementById('confirmModal').classList.remove('open'); onYes(); };
+  document.getElementById('confirmNo').onclick = () => document.getElementById('confirmModal').classList.remove('open');
+}
+
+// ── VIEWS ──
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  ['navMenu','navRicette','navSpesa','navTodo'].forEach((id, i) => {
+    document.getElementById(id).classList.toggle('active', ['menu','ricette','spesa','todo'][i] === v);
+  });
+  if (v === 'ricette') { renderFilters(); renderRecipes(); }
+  if (v === 'menu') renderMenu();
+  if (v === 'spesa') renderSpesa();
+  if (v === 'todo') renderTodo();
+}
+
+// ── MENU ──
+function makeMealSlot(day, meal, r, idx) {
+  const color = MEAL_COLOR[meal];
+  const slot = document.createElement('div');
+  slot.className = 'meal-slot-filled';
+  slot.style.cssText = 'border:1px solid ' + color + '33;border-left:3px solid ' + color + ';background:#FFF8F0;border-radius:8px;padding:10px 12px;position:relative;margin-bottom:6px';
+  const row = document.createElement('div');
+  row.className = 'meal-row';
+  const emoji = document.createElement('span');
+  emoji.className = 'recipe-emoji';
+  emoji.textContent = r.emoji || '🍽️';
+  const info = document.createElement('div');
+  info.className = 'recipe-info';
+  const name = document.createElement('div');
+  name.className = 'recipe-name' + (r.id ? ' clickable' : '');
+  name.textContent = r.name;
+  if (r.id) name.addEventListener('click', () => openDetail(r.id));
+  const time = document.createElement('div');
+  time.className = 'recipe-time';
+  time.textContent = r.id ? r.time + ' min' : '';
+  info.appendChild(name); info.appendChild(time);
+  // Add button (shown only on last slot)
+  const addBtn = document.createElement('button');
+  addBtn.title = 'Aggiungi un altro piatto';
+  addBtn.textContent = '+';
+  addBtn.style.cssText = 'background:' + color + ';color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1';
+  addBtn.addEventListener('click', () => openPick(day, meal));
+  row.appendChild(emoji); row.appendChild(info); row.appendChild(addBtn);
+  row.style.paddingRight = '24px';
+  slot.appendChild(row);
+  const rm = document.createElement('button');
+  rm.className = 'remove-btn'; rm.textContent = '✕';
+  rm.addEventListener('click', () => { menu[day][meal].splice(idx, 1); save(); renderMenu(); });
+  slot.appendChild(rm);
+  return slot;
+}
+
+function renderMenu() {
+  const container = document.getElementById('menuContainer');
+  container.innerHTML = '';
+  DAYS.forEach(day => {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    const title = document.createElement('div');
+    title.className = 'day-name';
+    title.textContent = day;
+    card.appendChild(title);
+    const grid = document.createElement('div');
+    grid.className = 'meals-grid';
+    MEALS.forEach(meal => {
+      const col = document.createElement('div');
+      const label = document.createElement('div');
+      label.className = 'meal-label';
+      label.style.color = MEAL_COLOR[meal];
+      label.textContent = MEAL_ICON[meal] + ' ' + meal;
+      col.appendChild(label);
+      const slots = menu[day][meal] || [];
+      if (slots.length > 0) {
+        // Render all slots; add button only on last one
+        slots.forEach((r, idx) => {
+          const slot = makeMealSlot(day, meal, r, idx);
+          // Hide add button on all except last
+          if (idx < slots.length - 1) {
+            slot.querySelector('button[title="Aggiungi un altro piatto"]').style.display = 'none';
+          }
+          col.appendChild(slot);
+        });
+      } else {
+        const btn = document.createElement('button');
+        btn.className = 'meal-slot-empty'; btn.textContent = '+';
+        btn.addEventListener('mouseenter', () => { btn.style.borderColor = MEAL_COLOR[meal]; btn.style.color = MEAL_COLOR[meal]; btn.style.background = MEAL_COLOR[meal] + '11'; });
+        btn.addEventListener('mouseleave', () => { btn.style.borderColor = ''; btn.style.color = ''; btn.style.background = ''; });
+        btn.addEventListener('click', () => openPick(day, meal));
+        col.appendChild(btn);
+      }
+      grid.appendChild(col);
+    });
+    card.appendChild(grid);
+    container.appendChild(card);
+  });
+}
+
+// ── PICK MODAL ──
+function openPick(day, meal) {
+  pickTarget = { day, meal };
+  document.getElementById('pickSub').textContent = 'Aggiungi a';
+  document.getElementById('pickTitle').textContent = MEAL_ICON[meal] + ' ' + meal + ' · ' + day;
+  document.getElementById('freeNameInput').value = '';
+  document.getElementById('pickSearch').value = '';
+  switchPickTab('free');
+  document.getElementById('pickModal').classList.add('open');
+  setTimeout(() => document.getElementById('freeNameInput').focus(), 100);
+}
+function switchPickTab(tab) {
+  const isFree = tab === 'free';
+  document.getElementById('paneFree').style.display = isFree ? 'block' : 'none';
+  document.getElementById('paneRecipes').style.display = isFree ? 'none' : 'block';
+  document.getElementById('tabFree').style.background = isFree ? '#2C1810' : '#F5F0EA';
+  document.getElementById('tabFree').style.color = isFree ? '#F59E0B' : '#666';
+  document.getElementById('tabRecipes').style.background = isFree ? '#F5F0EA' : '#2C1810';
+  document.getElementById('tabRecipes').style.color = isFree ? '#666' : '#F59E0B';
+  if (!isFree) { renderPickList(); setTimeout(() => document.getElementById('pickSearch').focus(), 100); }
+}
+function renderPickList() {
+  const q = document.getElementById('pickSearch').value.toLowerCase();
+  const filtered = recipes.filter(r => r.name.toLowerCase().includes(q));
+  const list = document.getElementById('pickList');
+  list.innerHTML = '';
+  if (!filtered.length) { list.innerHTML = '<div style="text-align:center;color:#AAA;padding:20px">Nessuna ricetta trovata</div>'; return; }
+  filtered.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'pick-item';
+    btn.innerHTML = '<span class="pi-emoji">' + r.emoji + '</span><div><div class="pi-name">' + r.name + '</div><div class="pi-meta">' + r.category + ' · ' + r.time + ' min</div></div>';
+    btn.addEventListener('click', () => assignRecipe(r.id));
+    list.appendChild(btn);
+  });
+}
+function assignFree() {
+  const name = document.getElementById('freeNameInput').value.trim();
+  if (!name || !pickTarget) return;
+  if (!Array.isArray(menu[pickTarget.day][pickTarget.meal])) menu[pickTarget.day][pickTarget.meal] = [];
+  menu[pickTarget.day][pickTarget.meal].push({ name, emoji: '🍽️' });
+  save(); showToast('"' + name + '" aggiunto');
+  document.getElementById('pickModal').classList.remove('open');
+  pickTarget = null; renderMenu();
+}
+function assignRecipe(id) {
+  const r = recipes.find(x => x.id == id);
+  if (!r || !pickTarget) return;
+  if (!Array.isArray(menu[pickTarget.day][pickTarget.meal])) menu[pickTarget.day][pickTarget.meal] = [];
+  menu[pickTarget.day][pickTarget.meal].push(r);
+  save(); showToast('"' + r.name + '" aggiunto');
+  document.getElementById('pickModal').classList.remove('open');
+  pickTarget = null; renderMenu();
+}
+
+// ── DETAIL MODAL ──
+function openDetail(id) {
+  let r = recipes.find(x => x.id == id);
+  if (!r) {
+    for (const day of DAYS) {
+      for (const meal of MEALS) {
+        const slots = menu[day][meal] || [];
+        const found = Array.isArray(slots) ? slots.find(m => m && m.id == id) : (slots && slots.id == id ? slots : null);
+        if (found) { r = found; break; }
+      }
+      if (r) break;
+    }
+  }
+  if (!r) return;
+  document.getElementById('detailEmoji').textContent = r.emoji;
+  document.getElementById('detailCat').textContent = r.category;
+  document.getElementById('detailName').textContent = r.name;
+  document.getElementById('detailTime').textContent = '⏱ ' + r.time + ' minuti';
+  document.getElementById('detailInstructions').textContent = r.instructions;
+  const basePersone = r.persone || 4;
+  let currentPersone = (r.id && personeMap[String(r.id)]) ? personeMap[String(r.id)] : basePersone;
+  function renderIngredients() {
+    const mult = currentPersone / basePersone;
+    document.getElementById('detailIngredients').innerHTML = r.ingredients.map(i => {
+      let qtyDisplay = '';
+      if (i.qty) {
+        const match = i.qty.match(/^([0-9]+\.?[0-9]*)\s*(.*)$/);
+        if (match) {
+          const num = parseFloat(match[1]) * mult;
+          const unit = match[2];
+          const rounded = Math.round(num * 10) / 10;
+          qtyDisplay = rounded + (unit ? ' ' + unit : '');
+        } else { qtyDisplay = i.qty; }
+      }
+      return '<li><strong>' + qtyDisplay + '</strong>' + (qtyDisplay ? ' ' : '') + i.name + '</li>';
+    }).join('');
+    document.getElementById('detailPersoneVal').textContent = currentPersone;
+  }
+  document.getElementById('detailPersoneMinus').onclick = () => { if (currentPersone > 1) { currentPersone--; renderIngredients(); } };
+  document.getElementById('detailPersonePlus').onclick  = () => { currentPersone++; renderIngredients(); };
+  document.getElementById('btnConfirmPersone').onclick = () => {
+    if (r.id) {
+      personeMap[String(r.id)] = currentPersone;
+      save();
+    }
+    showToast('Porzioni salvate: ' + currentPersone + ' persone');
+    document.getElementById('detailModal').classList.remove('open');
+  };
+  renderIngredients();
+  document.getElementById('detailModal').classList.add('open');
+}
+
+// ── RICETTE ──
+function renderFilters() {
+  const container = document.getElementById('filtersContainer');
+  container.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (filterCat === cat ? ' active' : '');
+    btn.textContent = cat;
+    btn.addEventListener('click', () => { filterCat = cat; renderFilters(); renderRecipes(); });
+    container.appendChild(btn);
+  });
+}
+function renderRecipes() {
+  const q = (document.getElementById('recipeSearch').value || '').toLowerCase();
+  const filtered = recipes.filter(r => (filterCat === 'Tutti' || r.category === filterCat) && r.name.toLowerCase().includes(q));
+  document.getElementById('recipeCount').textContent = recipes.length + ' ricette salvate';
+  const grid = document.getElementById('recipesGrid');
+  grid.innerHTML = '';
+  if (!filtered.length) { grid.innerHTML = '<div class="empty-state"><div class="e-emoji">🍽️</div><div>Nessuna ricetta trovata</div></div>'; return; }
+  filtered.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'recipe-card';
+    card.innerHTML = '<div class="card-emoji">' + r.emoji + '</div><div class="cat">' + r.category + '</div><h3>' + r.name + '</h3><div class="meta">⏱ ' + r.time + ' min · 👤 ' + (r.persone||4) + ' pers. · ' + r.ingredients.length + ' ingredienti</div><div class="tags">' + r.ingredients.slice(0,3).map(i => '<span class="tag">' + i.name + '</span>').join('') + (r.ingredients.length > 3 ? '<span style="font-size:11px;color:#AAA">+' + (r.ingredients.length-3) + '</span>' : '') + '</div>';
+    const delBtn = document.createElement('button');
+    delBtn.title = 'Elimina ricetta'; delBtn.textContent = '🗑️';
+    delBtn.style.cssText = 'position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;font-size:16px;padding:4px;color:#CCC;transition:color 0.15s;z-index:2';
+    delBtn.addEventListener('mouseenter', () => delBtn.style.color = '#e53e3e');
+    delBtn.addEventListener('mouseleave', () => delBtn.style.color = '#CCC');
+    delBtn.addEventListener('click', e => { e.stopPropagation(); deleteRecipe(r.id); });
+    const editBtn = document.createElement('button');
+    editBtn.title = 'Modifica ricetta'; editBtn.textContent = '✏️';
+    editBtn.style.cssText = 'position:absolute;top:10px;right:38px;background:none;border:none;cursor:pointer;font-size:16px;padding:4px;color:#CCC;transition:color 0.15s;z-index:2';
+    editBtn.addEventListener('mouseenter', () => editBtn.style.color = '#2C1810');
+    editBtn.addEventListener('mouseleave', () => editBtn.style.color = '#CCC');
+    editBtn.addEventListener('click', e => { e.stopPropagation(); openEditForm(r.id); });
+    card.appendChild(editBtn);
+    card.appendChild(delBtn);
+    card.addEventListener('click', () => openDetail(r.id));
+    grid.appendChild(card);
+  });
+}
+function deleteRecipe(id) {
+  const r = recipes.find(x => x.id == id);
+  if (!r) return;
+  showConfirm('Eliminare la ricetta "' + r.name + '"?', () => {
+    recipes = recipes.filter(x => x.id != id);
+    DAYS.forEach(day => MEALS.forEach(meal => {
+      if (Array.isArray(menu[day][meal])) menu[day][meal] = menu[day][meal].filter(r => r && r.id != id);
+      else if (menu[day][meal] && menu[day][meal].id == id) menu[day][meal] = [];
+    }));
+    save(); renderRecipes(); showToast('"' + r.name + '" eliminata');
+  });
+}
+
+// ── FORM ──
+function toggleForm() {
+  const f = document.getElementById('recipeForm');
+  const isHidden = f.style.display === 'none';
+  f.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) { if (document.getElementById('ingRows').children.length === 0) addIngRow('', ''); }
+  else clearForm();
+}
+function clearForm() {
+  ['fName','fTime','fPersone','fInstructions'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fEmoji').value = ''; document.getElementById('fCat').value = 'Primi';
+  document.getElementById('ingRows').innerHTML = '';
+  addIngRow('', '');
+}
+function addIngRow(name, qty) {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 110px 32px;gap:6px;align-items:center';
+  const ni = document.createElement('input');
+  ni.placeholder = 'Ingrediente'; ni.value = name;
+  ni.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  const qi = document.createElement('input');
+  qi.placeholder = 'Quantità'; qi.value = qty;
+  qi.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  const del = document.createElement('button');
+  del.type = 'button'; del.textContent = '✕';
+  del.style.cssText = 'background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;padding:0';
+  del.addEventListener('click', () => { if (document.getElementById('ingRows').children.length > 1) row.remove(); });
+  row.appendChild(ni); row.appendChild(qi); row.appendChild(del);
+  document.getElementById('ingRows').appendChild(row);
+}
+function saveRecipe() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { showToast('Inserisci il nome della ricetta'); return; }
+  const ingRows = document.getElementById('ingRows').querySelectorAll('div');
+  const ingredients = [];
+  ingRows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const ingName = inputs[0].value.trim();
+    const ingQty = inputs[1].value.trim();
+    if (ingName) ingredients.push({name: ingName, qty: ingQty});
+  });
+  const r = { id: Date.now(), name, category: document.getElementById('fCat').value, time: parseInt(document.getElementById('fTime').value) || 0, persone: parseInt(document.getElementById('fPersone').value) || 4, emoji: document.getElementById('fEmoji').value.trim() || '🍽️', ingredients, instructions: document.getElementById('fInstructions').value.trim() };
+  recipes.push(r); save(); clearForm(); toggleForm(); renderRecipes();
+  showToast('Ricetta "' + r.name + '" salvata!');
+}
+
+// ── LISTA SPESA ──
+function scaleQty(qty, mult) {
+  if (!qty) return '';
+  const match = qty.match(/^([0-9]+\.?[0-9]*)\s*(.*)$/);
+  if (match) {
+    const num = parseFloat(match[1]) * mult;
+    const unit = match[2];
+    const rounded = Math.round(num * 10) / 10;
+    return rounded + (unit ? ' ' + unit : '');
+  }
+  return qty; // non-numeric (q.b. ecc.)
+}
+
+function generateSpesaFromMenu() {
+  const ingredientsMap = {};
+  DAYS.forEach(day => MEALS.forEach(meal => {
+    const slots = menu[day][meal];
+    const recipes_in_slot = Array.isArray(slots) ? slots : (slots ? [slots] : []);
+    recipes_in_slot.forEach(r => {
+      if (r && r.ingredients && r.ingredients.length) {
+        const basePersone = r.persone || 4;
+        const savedPersone = (r.id && personeMap[String(r.id)]) ? personeMap[String(r.id)] : basePersone;
+        const mult = savedPersone / basePersone;
+        r.ingredients.forEach(ing => {
+          const ingObj = typeof ing === 'string' ? {name: ing, qty: ''} : ing;
+          const key = ingObj.name.toLowerCase().trim();
+          if (!ingredientsMap[key]) {
+            ingredientsMap[key] = { name: ingObj.name, qty: scaleQty(ingObj.qty, mult) };
+          }
+        });
+      }
+    });
+  }));
+  const newItems = Object.values(ingredientsMap);
+  if (!newItems.length) { showToast('Nessun ingrediente trovato nel menù'); return; }
+  let added = 0;
+  newItems.forEach(ing => {
+    const text = ing.qty ? ing.qty + ' ' + ing.name : ing.name;
+    const exists = spesa.some(s => s.text.toLowerCase() === text.toLowerCase());
+    if (!exists) { spesa.push({ id: Date.now() + Math.random(), text, checked: false, category: 'Dal menù' }); added++; }
+  });
+  save(); renderSpesa();
+  showToast(added + ' ingredienti aggiunti alla lista');
+  switchView('spesa');
+}
+function addSpesaItem(text, category) {
+  text = text.trim();
+  if (!text) return;
+  spesa.push({ id: Date.now() + Math.random(), text, checked: false, category: category || 'Personale' });
+  save(); renderSpesa();
+}
+function renderSpesa() {
+  const container = document.getElementById('spesaContainer');
+  container.innerHTML = '';
+  const total = spesa.length;
+  const done = spesa.filter(s => s.checked).length;
+  document.getElementById('spesaCount').textContent = total + ' articoli · ' + done + ' spuntati';
+  if (!total) { container.innerHTML = '<div class="empty-state"><div class="e-emoji">🛒</div><div>Lista vuota — genera dalla settimana o aggiungi manualmente</div></div>'; return; }
+  const groups = {};
+  spesa.forEach(item => { const cat = item.category || 'Altro'; if (!groups[cat]) groups[cat] = []; groups[cat].push(item); });
+  Object.entries(groups).forEach(([cat, items]) => {
+    const section = document.createElement('div');
+    section.className = 'spesa-section';
+    const h4 = document.createElement('h4');
+    h4.textContent = cat;
+    section.appendChild(h4);
+    items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'spesa-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.checked = item.checked; cb.id = 'sp_' + item.id;
+      cb.addEventListener('change', () => { const s = spesa.find(x => x.id === item.id); if (s) { s.checked = cb.checked; save(); renderSpesa(); } });
+      const lbl = document.createElement('label');
+      lbl.htmlFor = 'sp_' + item.id; lbl.textContent = item.text;
+      if (item.checked) lbl.className = 'checked';
+      const del = document.createElement('button');
+      del.className = 'del-spesa'; del.textContent = '✕';
+      del.addEventListener('click', () => { spesa = spesa.filter(x => x.id !== item.id); save(); renderSpesa(); });
+      row.appendChild(cb); row.appendChild(lbl); row.appendChild(del);
+      section.appendChild(row);
+    });
+    container.appendChild(section);
+  });
+}
+
+// ── STAMPA ──
+function openPrintModal(type) {
+  let html = '';
+  if (type === 'menu') {
+    html += '<h2 style="margin-bottom:20px">📅 Menù della Settimana</h2>';
+    DAYS.forEach(day => {
+      let hasSomething = MEALS.some(m => { const s = menu[day][m]; return Array.isArray(s) ? s.length > 0 : !!s; });
+      if (!hasSomething) return;
+      html += '<div style="margin-bottom:16px;padding:12px;border:1px solid #EEE;border-radius:8px">';
+      html += '<strong style="font-size:15px">' + day + '</strong><br><br>';
+      MEALS.forEach(meal => {
+        const slots = menu[day][meal];
+        const items = Array.isArray(slots) ? slots : (slots ? [slots] : []);
+        if (items.length) {
+          html += '<span style="color:#888;font-size:12px">' + meal + ':</span> ' + items.map(r => r.name).join(', ') + '<br>';
+        }
+      });
+      html += '</div>';
+    });
+  } else {
+    html += '<h2 style="margin-bottom:8px">🛒 Lista della Spesa</h2>';
+    html += '<p style="color:#888;font-size:13px;margin-bottom:20px">' + new Date().toLocaleDateString('it-IT') + '</p>';
+    const items = spesa.filter(s => !s.checked);
+    const done = spesa.filter(s => s.checked);
+    if (items.length) { html += '<strong style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#888">Da comprare</strong><ul style="margin:8px 0 16px;padding-left:20px">'; items.forEach(i => { html += '<li style="padding:4px 0;font-size:15px">' + i.text + '</li>'; }); html += '</ul>'; }
+    if (done.length) { html += '<strong style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#AAA">Già acquistato</strong><ul style="margin:8px 0;padding-left:20px">'; done.forEach(i => { html += '<li style="padding:4px 0;font-size:15px;text-decoration:line-through;color:#AAA">' + i.text + '</li>'; }); html += '</ul>'; }
+  }
+  document.getElementById('printContent').innerHTML = html;
+  document.getElementById('printModal').classList.add('open');
+  const closeModal = () => document.getElementById('printModal').classList.remove('open');
+  document.getElementById('btnClosePrint').onclick = closeModal;
+  document.getElementById('btnClosePrint2').onclick = closeModal;
+  document.getElementById('printModal').onclick = e => { if (e.target === document.getElementById('printModal')) closeModal(); };
+  document.getElementById('btnDoPrint').onclick = () => {
+    const text = document.getElementById('printContent').innerText;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('btnDoPrint');
+        btn.textContent = '✅ Copiato!';
+        setTimeout(() => btn.textContent = '📋 Copia testo', 2000);
+      }).catch(() => {});
+    }
+  };
+}
+
+
+// ── MODIFICA RICETTA ──
+function addEIngRow(name, qty) {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 110px 32px;gap:6px;align-items:center';
+  const ni = document.createElement('input');
+  ni.placeholder = 'Ingrediente'; ni.value = name;
+  ni.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  const qi = document.createElement('input');
+  qi.placeholder = 'Quantità'; qi.value = qty;
+  qi.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  const del = document.createElement('button');
+  del.type = 'button'; del.textContent = '✕';
+  del.style.cssText = 'background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;padding:0';
+  del.addEventListener('click', () => { if (document.getElementById('eIngRows').children.length > 1) row.remove(); });
+  row.appendChild(ni); row.appendChild(qi); row.appendChild(del);
+  document.getElementById('eIngRows').appendChild(row);
+}
+
+function openEditForm(id) {
+  const r = recipes.find(x => x.id == id);
+  if (!r) return;
+  document.getElementById('eName').value = r.name;
+  document.getElementById('eCat').value = r.category;
+  document.getElementById('eTime').value = r.time;
+  document.getElementById('ePersone').value = r.persone || 4;
+  document.getElementById('eEmoji').value = r.emoji;
+  document.getElementById('eInstructions').value = r.instructions;
+  // Fill ingredient rows
+  document.getElementById('eIngRows').innerHTML = '';
+  (r.ingredients || []).forEach(i => addEIngRow(i.name, i.qty || ''));
+  if (!r.ingredients || r.ingredients.length === 0) addEIngRow('', '');
+  // Save button
+  document.getElementById('btnSaveEdit').onclick = () => saveEdit(id);
+  document.getElementById('editModal').classList.add('open');
+}
+
+function saveEdit(id) {
+  const name = document.getElementById('eName').value.trim();
+  if (!name) { showToast('Inserisci il nome della ricetta'); return; }
+  const ingRows = document.getElementById('eIngRows').querySelectorAll('div');
+  const ingredients = [];
+  ingRows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const ingName = inputs[0].value.trim();
+    const ingQty = inputs[1].value.trim();
+    if (ingName) ingredients.push({ name: ingName, qty: ingQty });
+  });
+  const idx = recipes.findIndex(x => x.id == id);
+  if (idx === -1) return;
+  const updated = {
+    ...recipes[idx],
+    name,
+    category: document.getElementById('eCat').value,
+    time: parseInt(document.getElementById('eTime').value) || 0,
+    persone: parseInt(document.getElementById('ePersone').value) || 4,
+    emoji: document.getElementById('eEmoji').value.trim() || '🍽️',
+    ingredients,
+    instructions: document.getElementById('eInstructions').value.trim()
+  };
+  recipes[idx] = updated;
+  // Also update in menu if assigned
+  DAYS.forEach(day => MEALS.forEach(meal => {
+    if (Array.isArray(menu[day][meal])) {
+      menu[day][meal] = menu[day][meal].map(r => (r && r.id == id) ? updated : r);
+    } else if (menu[day][meal] && menu[day][meal].id == id) {
+      menu[day][meal] = [updated];
+    }
+  }));
+  save();
+  renderRecipes();
+  document.getElementById('editModal').classList.remove('open');
+  showToast('"' + name + '" aggiornata!');
+}
+
+
+// ── TO DO LIST ──
+function renderTodo() {
+  const container = document.getElementById('todoContainer');
+  container.innerHTML = '';
+  const total = todo.length;
+  const done = todo.filter(t => t.checked).length;
+  document.getElementById('todoCount').textContent = total + ' lavori · ' + done + ' completati';
+  if (!total) {
+    container.innerHTML = '<div class="empty-state"><div class="e-emoji">✅</div><div>Nessun lavoro da fare — aggiungine uno!</div></div>';
+    return;
+  }
+  // Pending first, then done
+  const pending = todo.filter(t => !t.checked);
+  const completed = todo.filter(t => t.checked);
+  const allGroups = [];
+  if (pending.length) allGroups.push({ label: 'Da fare', items: pending });
+  if (completed.length) allGroups.push({ label: 'Completati', items: completed });
+
+  allGroups.forEach(group => {
+    const section = document.createElement('div');
+    section.className = 'spesa-section';
+    const h4 = document.createElement('h4');
+    h4.textContent = group.label;
+    section.appendChild(h4);
+    group.items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'spesa-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.checked = item.checked; cb.id = 'td_' + item.id;
+      cb.addEventListener('change', () => {
+        const t = todo.find(x => x.id === item.id);
+        if (t) { t.checked = cb.checked; save(); renderTodo(); }
+      });
+      const lbl = document.createElement('label');
+      lbl.htmlFor = 'td_' + item.id; lbl.textContent = item.text;
+      if (item.checked) lbl.className = 'checked';
+      const del = document.createElement('button');
+      del.className = 'del-spesa'; del.textContent = '✕';
+      del.addEventListener('click', () => { todo = todo.filter(x => x.id !== item.id); save(); renderTodo(); });
+      row.appendChild(cb); row.appendChild(lbl); row.appendChild(del);
+      section.appendChild(row);
+    });
+    container.appendChild(section);
+  });
+}
+
+// ── EVENTI ──
+document.getElementById('navMenu').addEventListener('click', () => switchView('menu'));
+document.getElementById('navRicette').addEventListener('click', () => switchView('ricette'));
+document.getElementById('navSpesa').addEventListener('click', () => switchView('spesa'));
+document.getElementById('btnClearMenu').addEventListener('click', () => { showConfirm('Svuotare tutto il menù settimanale?', () => { menu = makeEmptyMenu(); save(); renderMenu(); showToast('Menù svuotato'); }); });
+document.getElementById('btnPrint').addEventListener('click', () => openPrintModal('menu'));
+document.getElementById('btnGenSpesa').addEventListener('click', generateSpesaFromMenu);
+document.getElementById('btnToggleForm').addEventListener('click', toggleForm);
+document.getElementById('btnAddIngRow').addEventListener('click', () => addIngRow('', ''));
+document.getElementById('btnCancelForm').addEventListener('click', toggleForm);
+document.getElementById('btnSaveRecipe').addEventListener('click', saveRecipe);
+document.getElementById('btnCloseDetail').addEventListener('click', () => document.getElementById('detailModal').classList.remove('open'));
+document.getElementById('btnAssignFree').addEventListener('click', assignFree);
+document.getElementById('freeNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') assignFree(); });
+document.getElementById('tabFree').addEventListener('click', () => switchPickTab('free'));
+document.getElementById('tabRecipes').addEventListener('click', () => switchPickTab('recipes'));
+document.getElementById('pickSearch').addEventListener('input', renderPickList);
+document.getElementById('recipeSearch').addEventListener('input', renderRecipes);
+document.getElementById('btnAddSpesa').addEventListener('click', () => { const val = document.getElementById('spesaNewItem').value.trim(); if (!val) return; addSpesaItem(val, 'Personale'); document.getElementById('spesaNewItem').value = ''; showToast('"' + val + '" aggiunto alla lista'); });
+document.getElementById('spesaNewItem').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnAddSpesa').click(); });
+document.getElementById('btnClearSpesa').addEventListener('click', () => { showConfirm('Svuotare tutta la lista della spesa?', () => { spesa = []; save(); renderSpesa(); showToast('Lista svuotata'); }); });
+document.getElementById('btnPrintSpesa').addEventListener('click', () => openPrintModal('spesa'));
+document.getElementById('navTodo').addEventListener('click', () => switchView('todo'));
+document.getElementById('btnAddTodo').addEventListener('click', () => {
+  const val = document.getElementById('todoNewItem').value.trim();
+  if (!val) return;
+  todo.push({ id: Date.now() + Math.random(), text: val, checked: false });
+  save(); renderTodo();
+  document.getElementById('todoNewItem').value = '';
+  showToast('"' + val + '" aggiunto');
+});
+document.getElementById('todoNewItem').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnAddTodo').click(); });
+document.getElementById('btnClearTodoDone').addEventListener('click', () => {
+  if (!todo.some(t => t.checked)) { showToast('Nessun lavoro completato'); return; }
+  showConfirm('Rimuovere tutti i lavori completati?', () => { todo = todo.filter(t => !t.checked); save(); renderTodo(); showToast('Completati rimossi'); });
+});
+document.getElementById('btnClearTodo').addEventListener('click', () => {
+  showConfirm('Svuotare tutta la To Do List?', () => { todo = []; save(); renderTodo(); showToast('Lista svuotata'); });
+});
+document.getElementById('pickModal').addEventListener('click', e => { if (e.target === document.getElementById('pickModal')) { document.getElementById('pickModal').classList.remove('open'); pickTarget = null; } });
+document.getElementById('detailModal').addEventListener('click', e => { if (e.target === document.getElementById('detailModal')) document.getElementById('detailModal').classList.remove('open'); });
+document.getElementById('btnCloseEdit').addEventListener('click', () => document.getElementById('editModal').classList.remove('open'));
+document.getElementById('btnCancelEdit').addEventListener('click', () => document.getElementById('editModal').classList.remove('open'));
+document.getElementById('btnAddEIngRow').addEventListener('click', () => addEIngRow('', ''));
+document.getElementById('editModal').addEventListener('click', e => { if (e.target === document.getElementById('editModal')) document.getElementById('editModal').classList.remove('open'); });
+
+// ── INIT ──
+setSyncStatus('syncing', 'Connessione...');
+loadFromFirebase().then(() => {
+  startRealtimeSync();
+  renderMenu();
+  renderSpesa();
+  renderTodo();
+  document.getElementById('loadingScreen').style.display = 'none';
+});
+</script>
+
+<!-- MODAL: Modifica ricetta -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal modal-lg" style="max-width:600px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="font-size:17px">✏️ Modifica Ricetta</h3>
+      <button id="btnCloseEdit" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nome ricetta *</label><input id="eName" placeholder="es. Pasta al pomodoro"></div>
+      <div class="form-group"><label>Categoria</label>
+        <select id="eCat"><option>Antipasti</option><option>Primi</option><option>Secondi</option><option>Contorni</option><option>Dessert</option><option>Colazione</option></select>
+      </div>
+      <div class="form-group"><label>Tempo (minuti)</label><input id="eTime" type="number" placeholder="30"></div>
+      <div class="form-group"><label>Persone (porzioni base)</label><input id="ePersone" type="number" placeholder="4" min="1"></div>
+      <div class="form-group"><label>Emoji</label><input id="eEmoji" placeholder="🍽️" style="font-size:20px"></div>
+      <div class="form-group form-full">
+        <label>Ingredienti</label>
+        <div id="eIngRows" style="display:grid;gap:8px;margin-bottom:8px"></div>
+        <button type="button" id="btnAddEIngRow" class="btn-secondary" style="font-size:12px;padding:6px 14px">+ Aggiungi ingrediente</button>
+      </div>
+      <div class="form-group form-full"><label>Preparazione</label><textarea id="eInstructions" rows="3"></textarea></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-primary" id="btnSaveEdit" style="flex:1">💾 Salva modifiche</button>
+      <button class="btn-secondary" id="btnCancelEdit" style="flex:1">Annulla</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
