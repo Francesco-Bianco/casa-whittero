@@ -2,6 +2,13 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="/menu/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Casa Whittero">
+<meta name="theme-color" content="#2C1810">
+<link rel="apple-touch-icon" href="/menu/icon-192.png">
 <link rel="apple-touch-icon" id="appIcon" href="">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%232C1810'/><text x='50' y='58' font-size='42' font-family='Arial Black' font-weight='900' fill='%23F59E0B' text-anchor='middle'>CW</text></svg>">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -130,7 +137,8 @@
   #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2C1810; color: #F59E0B; padding: 12px 28px; border-radius: 40px; font-size: 14px; z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: none; white-space: nowrap; }
   .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #AAA; }
   .empty-state .e-emoji { font-size: 48px; margin-bottom: 12px; }
-  .loading-screen { position: fixed; inset: 0; background: #FDF6EC; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 16px; }
+  .loading-screen { position: fixed; inset: 0; background: #2C1810; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; gap: 16px; }
+  #loadingScreen { background: #FDF6EC; }
   .loading-screen .l-emoji { font-size: 56px; }
   .loading-screen p { color: #888; font-size: 15px; }
 </style>
@@ -159,6 +167,20 @@
 </head>
 <body>
 
+<!-- Login screen -->
+<div class="loading-screen" id="loginScreen" style="display:none">
+  <div style="text-align:center;padding:40px 24px;max-width:340px">
+    <div style="font-size:64px;margin-bottom:16px">🏠</div>
+    <div style="color:#F59E0B;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;font-family:Nunito,sans-serif">Benvenuto</div>
+    <h2 style="color:#FDF6EC;font-size:26px;font-weight:700;margin-bottom:8px;font-family:Nunito,sans-serif">Casa Whittero</h2>
+    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:32px;font-family:Nunito,sans-serif">Accedi per continuare</p>
+    <button id="btnGoogleLogin" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 24px;border-radius:12px;border:none;background:#FFF;color:#2C1810;cursor:pointer;font-family:Nunito,sans-serif;font-size:15px;font-weight:700">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-3.59-13.46-8.83l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Accedi con Google
+    </button>
+  </div>
+</div>
+
 <!-- Loading screen -->
 <div class="loading-screen" id="loadingScreen">
   <div class="l-emoji">🍽️</div>
@@ -171,7 +193,14 @@
     <h1>La mia casa</h1>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-    <div class="sync-status"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Connessione...</span></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="sync-status"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Connessione...</span></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <img id="userAvatar" src="" style="width:28px;height:28px;border-radius:50%;display:none;border:2px solid #F59E0B">
+        <span id="userName" style="color:rgba(255,255,255,0.6);font-size:12px"></span>
+        <button id="btnLogout" style="background:rgba(255,255,255,0.1);border:none;color:#FDF6EC;cursor:pointer;font-family:Nunito,sans-serif;font-size:12px;padding:4px 10px;border-radius:6px;display:none">Esci</button>
+      </div>
+    </div>
     <nav>
       <button class="active" id="navMenu">📅 Menù</button>
       <button id="navRicette">📖 Ricette</button>
@@ -351,7 +380,8 @@
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBfql3I39EURXmWHeT9aAblazfe8SwjHzg",
@@ -364,6 +394,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+let currentUser = null;
 
 // ── COSTANTI ──
 const DAYS = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"];
@@ -413,7 +446,7 @@ async function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
-      await setDoc(doc(db, 'cucina', 'data'), { recipes, menu, spesa, todo, personeMap });
+      await setDoc(doc(db, 'utenti', currentUser.uid), { recipes, menu, spesa, todo, personeMap });
       setSyncStatus('ok', 'Sincronizzato ✓');
     } catch(e) {
       console.error(e);
@@ -425,7 +458,7 @@ async function save() {
 // ── FIREBASE LOAD ──
 async function loadFromFirebase() {
   try {
-    const snap = await getDoc(doc(db, 'cucina', 'data'));
+    const snap = await getDoc(doc(db, 'utenti', currentUser.uid));
     if (snap.exists()) {
       const data = snap.data();
       recipes = (data.recipes || []).map(r => ({
@@ -464,7 +497,7 @@ async function loadFromFirebase() {
 
 // ── REAL-TIME LISTENER ──
 function startRealtimeSync() {
-  onSnapshot(doc(db, 'cucina', 'data'), (snap) => {
+  onSnapshot(doc(db, 'utenti', currentUser.uid), (snap) => {
     if (!snap.exists()) return;
     const data = snap.data();
     recipes = (data.recipes || []).map(r => ({
@@ -1105,14 +1138,55 @@ document.getElementById('btnCancelEdit').addEventListener('click', () => documen
 document.getElementById('btnAddEIngRow').addEventListener('click', () => addEIngRow('', ''));
 document.getElementById('editModal').addEventListener('click', e => { if (e.target === document.getElementById('editModal')) document.getElementById('editModal').classList.remove('open'); });
 
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/menu/sw.js').catch(err => console.log('SW error:', err));
+}
+
 // ── INIT ──
-setSyncStatus('syncing', 'Connessione...');
-loadFromFirebase().then(() => {
-  startRealtimeSync();
-  renderMenu();
-  renderSpesa();
-  renderTodo();
-  document.getElementById('loadingScreen').style.display = 'none';
+document.getElementById('loadingScreen').style.display = 'flex';
+document.getElementById('loginScreen').style.display = 'none';
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    // Show user info
+    document.getElementById('userName').textContent = user.displayName ? user.displayName.split(' ')[0] : user.email;
+    if (user.photoURL) {
+      document.getElementById('userAvatar').src = user.photoURL;
+      document.getElementById('userAvatar').style.display = 'block';
+    }
+    document.getElementById('btnLogout').style.display = 'block';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('loadingScreen').style.display = 'flex';
+    setSyncStatus('syncing', 'Connessione...');
+    loadFromFirebase().then(() => {
+      startRealtimeSync();
+      renderMenu();
+      renderSpesa();
+      renderTodo();
+      document.getElementById('loadingScreen').style.display = 'none';
+    });
+  } else {
+    currentUser = null;
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('userAvatar').style.display = 'none';
+    document.getElementById('btnLogout').style.display = 'none';
+    document.getElementById('userName').textContent = '';
+  }
+});
+
+document.getElementById('btnGoogleLogin').addEventListener('click', () => {
+  signInWithPopup(auth, provider).catch(err => {
+    showToast('Errore login: ' + err.message);
+  });
+});
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+  showConfirm('Vuoi uscire?', () => {
+    signOut(auth);
+  });
 });
 </script>
 
