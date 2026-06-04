@@ -66,9 +66,10 @@
   @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
   .tab-btn { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 8px;background:none;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-size:11px;color:rgba(255,255,255,0.5);transition:color 0.2s; }
   .tab-btn.active-tab { color:#F59E0B; }
-  nav button { padding:8px 14px;font-size:13px; }
-  @media (max-width:500px) { nav button { padding:7px 10px;font-size:12px; } }
-  nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  nav button { padding:8px 12px;font-size:13px;white-space:nowrap;flex-shrink:0; }
+  @media (max-width:500px) { nav button { padding:7px 9px;font-size:12px; } }
+  nav { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
   nav button { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 13px; transition: all 0.2s; }
   nav button.active { background: #F59E0B; color: var(--text); font-weight: 700; }
   nav button:not(.active) { background: rgba(255,255,255,0.1); color: #FDF6EC; }
@@ -1362,6 +1363,8 @@ document.getElementById('toggleTheme').addEventListener('change', function() {
   updateThemeSlider(this.checked);
 });
 document.getElementById('btnRefresh').addEventListener('click', refreshApp);
+document.getElementById('tabHome').addEventListener('click', () => { switchView('menu'); setTab('tabHome'); });
+document.getElementById('tabSettings').addEventListener('click', () => { switchView('impostazioni'); setTab('tabSettings'); });
 document.getElementById('btnLogoutSettings').addEventListener('click', () => {
   showConfirm('Vuoi uscire?', () => { signOut(auth); });
 });
@@ -1459,11 +1462,11 @@ document.getElementById('btnGoogleLogin').addEventListener('click', () => {
 <!-- BOTTOM TAB BAR -->
 <div id="bottomBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#2C1810;border-top:1px solid rgba(255,255,255,0.1);z-index:500;padding:0 0 env(safe-area-inset-bottom) 0">
   <div style="display:flex;max-width:1100px;margin:0 auto">
-    <button id="tabHome" class="tab-btn active-tab" onclick="switchView('menu');setTab('tabHome')">
+    <button id="tabHome" class="tab-btn active-tab">
       <span style="font-size:20px">🏠</span>
       <span>La mia casa</span>
     </button>
-    <button id="tabSettings" class="tab-btn" onclick="switchView('impostazioni');setTab('tabSettings')">
+    <button id="tabSettings" class="tab-btn">
       <span style="font-size:20px">⚙️</span>
       <span>Impostazioni</span>
     </button>
