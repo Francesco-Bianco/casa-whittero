@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Casa Whittero">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Casa Whittero</title>
+<title>Nome della casa</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -185,7 +185,7 @@
   <div style="text-align:center;padding:40px 24px;max-width:340px">
     <div style="font-size:64px;margin-bottom:16px">🏠</div>
     <div style="color:#F59E0B;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;font-family:Nunito,sans-serif">Benvenuto</div>
-    <h2 style="color:#FDF6EC;font-size:26px;font-weight:700;margin-bottom:8px;font-family:Nunito,sans-serif">Casa Whittero</h2>
+    <h2 style="color:#FDF6EC;font-size:26px;font-weight:700;margin-bottom:8px;font-family:Nunito,sans-serif">Nome della casa</h2>
     <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:32px;font-family:Nunito,sans-serif">Accedi per continuare</p>
     <button id="btnGoogleLogin" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 24px;border-radius:12px;border:none;background:#FFF;color:#2C1810;cursor:pointer;font-family:Nunito,sans-serif;font-size:15px;font-weight:700">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-3.59-13.46-8.83l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -201,9 +201,19 @@
 </div>
 
 <header>
-  <div class="header-title">
-    <div class="subtitle">Casa Whittero</div>
-    <h1>La mia casa</h1>
+  <div class="header-title" style="cursor:pointer" id="headerTitleArea" title="Clicca per modificare">
+    <div class="subtitle" id="displaySubtitle">Nome della casa</div>
+    <h1 id="displayTitle">La mia casa</h1>
+  </div>
+
+  <!-- Inline edit form (hidden by default) -->
+  <div id="editTitleForm" style="display:none;flex-direction:column;gap:6px">
+    <input id="inputSubtitle" placeholder="Nome della casa" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 10px;color:#F59E0B;font-family:Nunito,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;width:180px;outline:none">
+    <input id="inputTitle" placeholder="Es. La mia casa" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 10px;color:#FDF6EC;font-family:Nunito,sans-serif;font-size:18px;font-weight:700;width:180px;outline:none">
+    <div style="display:flex;gap:6px;margin-top:2px">
+      <button id="btnSaveTitle" style="background:#F59E0B;border:none;border-radius:5px;padding:4px 12px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;color:#2C1810;cursor:pointer">✓ Salva</button>
+      <button id="btnCancelTitle" style="background:rgba(255,255,255,0.1);border:none;border-radius:5px;padding:4px 10px;font-family:Nunito,sans-serif;font-size:12px;color:#FDF6EC;cursor:pointer">Annulla</button>
+    </div>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
     <div style="display:flex;align-items:center;gap:12px">
@@ -298,7 +308,7 @@
       <h3 style="font-size:17px">Anteprima stampa</h3>
       <button id="btnClosePrint" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888">✕</button>
     </div>
-    <div style="background:#FFF;border-radius:10px;padding:24px;border:1px solid #EEE;margin-bottom:20px;font-family:'Nunito',sans-serif;line-height:1.7" id="printContent"></div>
+    <div style="background:var(--bg2);border-radius:10px;padding:24px;border:1px solid var(--border);margin-bottom:20px;font-family:'Nunito',sans-serif;line-height:1.7" id="printContent"></div>
     <div style="display:flex;gap:10px;margin-bottom:12px">
       <button class="btn-primary" id="btnDoPrint" style="flex:1">📋 Copia testo</button>
       <button class="btn-secondary" id="btnClosePrint2" style="flex:1">Chiudi</button>
@@ -571,7 +581,7 @@ function makeMealSlot(day, meal, r, idx) {
   const color = MEAL_COLOR[meal];
   const slot = document.createElement('div');
   slot.className = 'meal-slot-filled';
-  slot.style.cssText = 'border:1px solid ' + color + '33;border-left:3px solid ' + color + ';background:#FFF8F0;border-radius:8px;padding:10px 12px;position:relative;margin-bottom:6px';
+  slot.style.cssText = 'border:1px solid ' + color + '33;border-left:3px solid ' + color + ';background:var(--bg3);border-radius:8px;padding:10px 12px;position:relative;margin-bottom:6px';
   const row = document.createElement('div');
   row.className = 'meal-row';
   const emoji = document.createElement('span');
@@ -827,10 +837,10 @@ function addIngRow(name, qty) {
   row.style.cssText = 'display:grid;grid-template-columns:1fr 110px 32px;gap:6px;align-items:center';
   const ni = document.createElement('input');
   ni.placeholder = 'Ingrediente'; ni.value = name;
-  ni.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  ni.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid var(--border2);font-size:14px;outline:none;color:var(--text);background:var(--input-bg)';
   const qi = document.createElement('input');
   qi.placeholder = 'Quantità'; qi.value = qty;
-  qi.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  qi.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid var(--border2);font-size:14px;outline:none;color:var(--text);background:var(--input-bg)';
   const del = document.createElement('button');
   del.type = 'button'; del.textContent = '✕';
   del.style.cssText = 'background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;padding:0';
@@ -991,10 +1001,10 @@ function addEIngRow(name, qty) {
   row.style.cssText = 'display:grid;grid-template-columns:1fr 110px 32px;gap:6px;align-items:center';
   const ni = document.createElement('input');
   ni.placeholder = 'Ingrediente'; ni.value = name;
-  ni.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  ni.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid var(--border2);font-size:14px;outline:none;color:var(--text);background:var(--input-bg)';
   const qi = document.createElement('input');
   qi.placeholder = 'Quantità'; qi.value = qty;
-  qi.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid #DDD;font-size:14px;outline:none;color:#2C1810';
+  qi.style.cssText = 'padding:8px 10px;border-radius:7px;border:1px solid var(--border2);font-size:14px;outline:none;color:var(--text);background:var(--input-bg)';
   const del = document.createElement('button');
   del.type = 'button'; del.textContent = '✕';
   del.style.cssText = 'background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;padding:0';
@@ -1123,6 +1133,38 @@ function toggleTheme() {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
+
+// ── TITOLO PERSONALIZZATO ──
+function loadTitle() {
+  const sub = localStorage.getItem('casa_subtitle') || 'Nome della casa';
+  const title = localStorage.getItem('casa_title') || 'La mia casa';
+  document.getElementById('displaySubtitle').textContent = sub;
+  document.getElementById('displayTitle').textContent = title;
+}
+function openTitleEdit() {
+  const sub = localStorage.getItem('casa_subtitle') || 'Nome della casa';
+  const title = localStorage.getItem('casa_title') || 'La mia casa';
+  document.getElementById('inputSubtitle').value = sub;
+  document.getElementById('inputTitle').value = title;
+  document.getElementById('headerTitleArea').style.display = 'none';
+  document.getElementById('editTitleForm').style.display = 'flex';
+  document.getElementById('inputTitle').focus();
+}
+function saveTitleEdit() {
+  const sub = document.getElementById('inputSubtitle').value.trim() || 'Nome della casa';
+  const title = document.getElementById('inputTitle').value.trim() || 'La mia casa';
+  localStorage.setItem('casa_subtitle', sub);
+  localStorage.setItem('casa_title', title);
+  document.getElementById('displaySubtitle').textContent = sub;
+  document.getElementById('displayTitle').textContent = title;
+  document.getElementById('editTitleForm').style.display = 'none';
+  document.getElementById('headerTitleArea').style.display = 'block';
+}
+function cancelTitleEdit() {
+  document.getElementById('editTitleForm').style.display = 'none';
+  document.getElementById('headerTitleArea').style.display = 'block';
+}
+
 // ── EVENTI ──
 document.getElementById('navMenu').addEventListener('click', () => switchView('menu'));
 document.getElementById('navRicette').addEventListener('click', () => switchView('ricette'));
@@ -1165,6 +1207,11 @@ document.getElementById('btnClearTodo').addEventListener('click', () => {
 document.getElementById('pickModal').addEventListener('click', e => { if (e.target === document.getElementById('pickModal')) { document.getElementById('pickModal').classList.remove('open'); pickTarget = null; } });
 document.getElementById('detailModal').addEventListener('click', e => { if (e.target === document.getElementById('detailModal')) document.getElementById('detailModal').classList.remove('open'); });
 document.getElementById('btnTheme').addEventListener('click', toggleTheme);
+document.getElementById('headerTitleArea').addEventListener('click', openTitleEdit);
+document.getElementById('btnSaveTitle').addEventListener('click', saveTitleEdit);
+document.getElementById('btnCancelTitle').addEventListener('click', cancelTitleEdit);
+document.getElementById('inputTitle').addEventListener('keydown', e => { if (e.key === 'Enter') saveTitleEdit(); if (e.key === 'Escape') cancelTitleEdit(); });
+document.getElementById('inputSubtitle').addEventListener('keydown', e => { if (e.key === 'Enter') saveTitleEdit(); if (e.key === 'Escape') cancelTitleEdit(); });
 document.getElementById('btnCloseEdit').addEventListener('click', () => document.getElementById('editModal').classList.remove('open'));
 document.getElementById('btnCancelEdit').addEventListener('click', () => document.getElementById('editModal').classList.remove('open'));
 document.getElementById('btnAddEIngRow').addEventListener('click', () => addEIngRow('', ''));
@@ -1177,6 +1224,7 @@ if ('serviceWorker' in navigator) {
 
 // ── INIT ──
 initTheme();
+loadTitle();
 document.getElementById('loadingScreen').style.display = 'flex';
 document.getElementById('loginScreen').style.display = 'none';
 
