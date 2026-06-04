@@ -230,6 +230,7 @@
 <div class="loading-screen" id="loadingScreen">
   <div class="l-emoji">🍽️</div>
   <p>Caricamento in corso...</p>
+  <p id="loadingError" style="color:#e53e3e;font-size:13px;margin-top:16px;max-width:280px;text-align:center;display:none"></p>
 </div>
 
 <header style="flex-direction:column;align-items:stretch;padding:10px 16px 0">
@@ -1404,6 +1405,10 @@ onAuthStateChanged(auth, (user) => {
       renderSpesa();
       renderTodo();
       showBottomBar(true);
+      document.getElementById('loadingScreen').style.display = 'none';
+    }).catch(err => {
+      const errEl = document.getElementById('loadingError');
+      if (errEl) { errEl.textContent = 'Errore: ' + err.message; errEl.style.display = 'block'; }
       document.getElementById('loadingScreen').style.display = 'none';
     });
   } else {
