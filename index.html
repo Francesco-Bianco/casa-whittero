@@ -1250,7 +1250,6 @@ if ('serviceWorker' in navigator) {
 
 // ── INIT ──
 initTheme();
-loadTitle();
 document.getElementById('loadingScreen').style.display = 'flex';
 document.getElementById('loginScreen').style.display = 'none';
 
@@ -1269,6 +1268,7 @@ onAuthStateChanged(auth, (user) => {
     setSyncStatus('syncing', 'Connessione...');
     loadFromFirebase().then(() => {
       startRealtimeSync();
+      loadTitle();
       renderMenu();
       renderSpesa();
       renderTodo();
