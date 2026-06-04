@@ -1221,9 +1221,10 @@ function initTheme() {
 }
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
-  const btn = document.getElementById('btnTheme');
-  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
   localStorage.setItem('casa_theme', theme);
+  updateThemeSlider(theme === 'dark');
+  const toggle = document.getElementById('toggleTheme');
+  if (toggle) toggle.checked = theme === 'dark';
 }
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'light';
@@ -1355,8 +1356,7 @@ document.getElementById('btnClearTodo').addEventListener('click', () => {
 });
 document.getElementById('pickModal').addEventListener('click', e => { if (e.target === document.getElementById('pickModal')) { document.getElementById('pickModal').classList.remove('open'); pickTarget = null; } });
 document.getElementById('detailModal').addEventListener('click', e => { if (e.target === document.getElementById('detailModal')) document.getElementById('detailModal').classList.remove('open'); });
-document.getElementById('btnTheme').addEventListener('click', toggleTheme);
-// btnRefresh is now inside settings view, wired after render
+// btnTheme removed from nav - theme now in settings
 document.getElementById('toggleTheme').addEventListener('change', function() {
   applyTheme(this.checked ? 'dark' : 'light');
   updateThemeSlider(this.checked);
@@ -1424,11 +1424,7 @@ document.getElementById('btnGoogleLogin').addEventListener('click', () => {
   });
 });
 
-document.getElementById('btnLogout').addEventListener('click', () => {
-  showConfirm('Vuoi uscire?', () => {
-    signOut(auth);
-  });
-});
+// btnLogout replaced by btnLogoutSettings in settings page
 </script>
 
 <!-- MODAL: Modifica ricetta -->
