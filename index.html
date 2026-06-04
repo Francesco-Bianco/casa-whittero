@@ -64,12 +64,16 @@
   .sync-dot.error { background: #e53e3e; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .tab-btn { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 8px;background:none;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-size:11px;color:rgba(255,255,255,0.5);transition:color 0.2s; }
+  .tab-btn.active-tab { color:#F59E0B; }
+  nav button { padding:8px 14px;font-size:13px; }
+  @media (max-width:500px) { nav button { padding:7px 10px;font-size:12px; } }
   nav { display: flex; gap: 8px; flex-wrap: wrap; }
   nav button { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 13px; transition: all 0.2s; }
   nav button.active { background: #F59E0B; color: var(--text); font-weight: 700; }
   nav button:not(.active) { background: rgba(255,255,255,0.1); color: #FDF6EC; }
 
-  main { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 20px 100px 20px; }
   .view { display: none; } .view.active { display: block; }
 
   .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
@@ -247,16 +251,14 @@
       <div style="display:flex;align-items:center;gap:8px">
         <img id="userAvatar" src="" style="width:28px;height:28px;border-radius:50%;display:none;border:2px solid #F59E0B">
         <span id="userName" style="color:rgba(255,255,255,0.6);font-size:12px"></span>
-        <button id="btnLogout" style="background:rgba(255,255,255,0.1);border:none;color:#FDF6EC;cursor:pointer;font-family:Nunito,sans-serif;font-size:12px;padding:4px 10px;border-radius:6px;display:none">Esci</button>
+        <button id="btnLogout" style="display:none"></button>
       </div>
     </div>
     <nav>
       <button class="active" id="navMenu">📅 Menù</button>
       <button id="navRicette">📖 Ricette</button>
-      <button id="navSpesa">🛒 Lista Spesa</button>
+      <button id="navSpesa">🛒 Spesa</button>
       <button id="navTodo">✅ To Do</button>
-      <button id="btnTheme" style="background:rgba(255,255,255,0.1);border:none;color:#FDF6EC;cursor:pointer;font-size:18px;padding:8px 12px;border-radius:6px" title="Tema chiaro/scuro">🌙</button>
-      <button id="btnRefresh" style="background:rgba(255,255,255,0.1);border:none;color:#FDF6EC;cursor:pointer;font-size:18px;padding:8px 12px;border-radius:6px" title="Aggiorna app">🔄</button>
     </nav>
   </div>
 </header>
@@ -424,6 +426,65 @@
     <div class="spesa-add-row" style="margin-top:20px">
       <input id="todoNewItem" placeholder="Aggiungi lavoro da fare...">
       <button class="btn-primary" id="btnAddTodo">Aggiungi</button>
+    </div>
+  </div>
+
+  <!-- IMPOSTAZIONI -->
+  <div class="view" id="view-impostazioni">
+    <div class="page-header">
+      <div><h2>Impostazioni</h2></div>
+    </div>
+
+    <div style="max-width:500px;display:flex;flex-direction:column;gap:12px">
+
+      <!-- Account -->
+      <div style="background:var(--bg2);border-radius:12px;padding:20px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px">Account</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <img id="settingsAvatar" src="" style="width:44px;height:44px;border-radius:50%;display:none;border:2px solid #F59E0B">
+          <div>
+            <div id="settingsName" style="font-size:16px;font-weight:700;color:var(--text)"></div>
+            <div id="settingsEmail" style="font-size:13px;color:var(--text3)"></div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px">☁️ Backup Firebase: <span style="color:#4ade80;font-weight:700">Attivo</span></div>
+        <div style="font-size:11px;color:var(--text3)">I tuoi dati sono privati e separati dagli altri utenti</div>
+      </div>
+
+      <!-- Tema -->
+      <div style="background:var(--bg2);border-radius:12px;padding:20px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Aspetto</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">🌙</span>
+            <span style="font-size:15px;color:var(--text);font-weight:600">Tema scuro</span>
+          </div>
+          <label style="position:relative;display:inline-block;width:50px;height:28px;cursor:pointer">
+            <input type="checkbox" id="toggleTheme" style="opacity:0;width:0;height:0">
+            <span id="themeSlider" style="position:absolute;inset:0;background:#555;border-radius:28px;transition:0.3s">
+              <span style="position:absolute;left:3px;bottom:3px;width:22px;height:22px;background:#FFF;border-radius:50%;transition:0.3s;display:block" id="themeKnob"></span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Aggiorna app -->
+      <div style="background:var(--bg2);border-radius:12px;padding:20px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">App</div>
+        <button id="btnRefresh" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;border-radius:10px;border:1px solid var(--border2);background:transparent;cursor:pointer;font-family:Nunito,sans-serif;color:var(--text)">
+          <span style="font-size:20px">🔄</span>
+          <div style="text-align:left">
+            <div style="font-size:15px;font-weight:600">Ricarica e aggiorna</div>
+            <div style="font-size:12px;color:var(--text3)">Pulisce la cache e scarica l'ultima versione</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Esci -->
+      <button id="btnLogoutSettings" style="width:100%;padding:16px;border-radius:12px;border:none;background:rgba(229,62,62,0.15);color:#e53e3e;cursor:pointer;font-family:Nunito,sans-serif;font-size:15px;font-weight:700;margin-top:4px">
+        Esci dall'account
+      </button>
+
     </div>
   </div>
 </main>
@@ -603,10 +664,13 @@ function switchView(v) {
   ['navMenu','navRicette','navSpesa','navTodo'].forEach((id, i) => {
     document.getElementById(id).classList.toggle('active', ['menu','ricette','spesa','todo'][i] === v);
   });
+  // Hide top nav when in settings
+  document.querySelector('nav').style.display = v === 'impostazioni' ? 'none' : 'flex';
   if (v === 'ricette') { renderFilters(); renderRecipes(); }
   if (v === 'menu') renderMenu();
   if (v === 'spesa') renderSpesa();
   if (v === 'todo') renderTodo();
+  if (v === 'impostazioni') renderSettings();
 }
 
 // ── MENU ──
@@ -1213,6 +1277,43 @@ async function refreshApp() {
   }
 }
 
+
+// ── IMPOSTAZIONI ──
+function renderSettings() {
+  const user = currentUser;
+  if (!user) return;
+  document.getElementById('settingsName').textContent = user.displayName || 'Utente';
+  document.getElementById('settingsEmail').textContent = user.email || '';
+  if (user.photoURL) {
+    document.getElementById('settingsAvatar').src = user.photoURL;
+    document.getElementById('settingsAvatar').style.display = 'block';
+  }
+  // Sync toggle state
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('toggleTheme').checked = isDark;
+  updateThemeSlider(isDark);
+}
+
+function updateThemeSlider(isDark) {
+  const slider = document.getElementById('themeSlider');
+  const knob = document.getElementById('themeKnob');
+  if (!slider || !knob) return;
+  slider.style.background = isDark ? '#F59E0B' : '#555';
+  knob.style.transform = isDark ? 'translateX(22px)' : 'translateX(0)';
+}
+
+function setTab(tabId) {
+  ['tabHome','tabSettings'].forEach(id => {
+    document.getElementById(id).classList.toggle('active-tab', id === tabId);
+  });
+}
+
+// Show bottom bar only when logged in
+function showBottomBar(show) {
+  document.getElementById('bottomBar').style.display = show ? 'block' : 'none';
+  document.getElementById('bottomSpacer').style.display = show ? 'block' : 'none';
+}
+
 // ── EVENTI ──
 document.getElementById('navMenu').addEventListener('click', () => switchView('menu'));
 document.getElementById('navRicette').addEventListener('click', () => switchView('ricette'));
@@ -1255,7 +1356,15 @@ document.getElementById('btnClearTodo').addEventListener('click', () => {
 document.getElementById('pickModal').addEventListener('click', e => { if (e.target === document.getElementById('pickModal')) { document.getElementById('pickModal').classList.remove('open'); pickTarget = null; } });
 document.getElementById('detailModal').addEventListener('click', e => { if (e.target === document.getElementById('detailModal')) document.getElementById('detailModal').classList.remove('open'); });
 document.getElementById('btnTheme').addEventListener('click', toggleTheme);
+// btnRefresh is now inside settings view, wired after render
+document.getElementById('toggleTheme').addEventListener('change', function() {
+  applyTheme(this.checked ? 'dark' : 'light');
+  updateThemeSlider(this.checked);
+});
 document.getElementById('btnRefresh').addEventListener('click', refreshApp);
+document.getElementById('btnLogoutSettings').addEventListener('click', () => {
+  showConfirm('Vuoi uscire?', () => { signOut(auth); });
+});
 document.getElementById('headerTitleArea').addEventListener('click', openTitleEdit);
 document.getElementById('btnSaveTitle').addEventListener('click', saveTitleEdit);
 document.getElementById('btnCancelTitle').addEventListener('click', cancelTitleEdit);
@@ -1295,10 +1404,12 @@ onAuthStateChanged(auth, (user) => {
       renderMenu();
       renderSpesa();
       renderTodo();
+      showBottomBar(true);
       document.getElementById('loadingScreen').style.display = 'none';
     });
   } else {
     currentUser = null;
+    showBottomBar(false);
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('userAvatar').style.display = 'none';
@@ -1348,5 +1459,22 @@ document.getElementById('btnLogout').addEventListener('click', () => {
     </div>
   </div>
 </div>
+
+<!-- BOTTOM TAB BAR -->
+<div id="bottomBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#2C1810;border-top:1px solid rgba(255,255,255,0.1);z-index:500;padding:0 0 env(safe-area-inset-bottom) 0">
+  <div style="display:flex;max-width:1100px;margin:0 auto">
+    <button id="tabHome" class="tab-btn active-tab" onclick="switchView('menu');setTab('tabHome')">
+      <span style="font-size:20px">🏠</span>
+      <span>La mia casa</span>
+    </button>
+    <button id="tabSettings" class="tab-btn" onclick="switchView('impostazioni');setTab('tabSettings')">
+      <span style="font-size:20px">⚙️</span>
+      <span>Impostazioni</span>
+    </button>
+  </div>
+</div>
+
+<!-- Spacer for bottom bar -->
+<div id="bottomSpacer" style="display:none;height:70px"></div>
 </body>
 </html>
