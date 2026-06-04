@@ -1,4 +1,7 @@
-const CACHE_NAME = 'casa-whittero-v2';
+// Cambia questo numero ogni volta che aggiorni i file
+const CACHE_VERSION = 'v3';
+const CACHE_NAME = 'casa-whittero-' + CACHE_VERSION;
+
 const ASSETS = [
   '/casa-whittero/index.html',
   '/casa-whittero/manifest.json',
@@ -10,7 +13,7 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS).catch(() => {}))
   );
-  self.skipWaiting();
+  self.skipWaiting(); // forza attivazione immediata
 });
 
 self.addEventListener('activate', e => {
@@ -19,18 +22,19 @@ self.addEventListener('activate', e => {
       Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     )
   );
-  self.clients.claim();
+  self.clients.claim(); // prende controllo di tutte le tab aperte subito
 });
 
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('firebase') || e.request.url.includes('googleapis') || e.request.url.includes('gstatic')) {
-    return; // always network for Firebase/Google
+    return;
   }
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+    // Network first: prova sempre la rete, usa cache solo se offline
+    fetch(e.request).then(res => {
       const clone = res.clone();
       caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
       return res;
-    }))
+    }).catch(() => caches.match(e.request))
   );
 });
