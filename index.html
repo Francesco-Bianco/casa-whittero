@@ -65,10 +65,10 @@
   .sync-dot.error { background: #e53e3e; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-  .bottom-bar-hidden { display: none !important; }
+  #bottomBar { display: none; }
   .tab-btn { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 8px;background:none;border:none;cursor:pointer;font-family:Nunito,sans-serif;font-size:11px;color:rgba(255,255,255,0.5);transition:color 0.2s; }
   .tab-btn.active-tab { color:#F59E0B; }
-  nav button { padding:10px 2px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  nav button { padding:10px 8px;font-size:14px; }
   nav { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   nav::-webkit-scrollbar { display: none; }
   nav button { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 13px; transition: all 0.2s; }
@@ -258,8 +258,8 @@
   <nav style="width:100%;padding-bottom:10px">
     <button class="active" id="navMenu">📅 Menù</button>
     <button id="navRicette">📖 Ricette</button>
-    <button id="navSpesa">🛒 Spesa</button>
-    <button id="navTodo">✅ ToDo</button>
+    <button id="navSpesa">🛒 Lista Spesa</button>
+    <button id="navTodo">✅ To Do</button>
   </nav>
 </header>
 
@@ -1311,11 +1311,8 @@ function setTab(tabId) {
 function showBottomBar(show) {
   const bar = document.getElementById('bottomBar');
   const spacer = document.getElementById('bottomSpacer');
-  if (bar) {
-    if (show) bar.classList.remove('bottom-bar-hidden');
-    else bar.classList.add('bottom-bar-hidden');
-  }
-  if (spacer) spacer.style.display = show ? 'block' : 'none';
+  if (bar) bar.style.setProperty('display', show ? 'block' : 'none', 'important');
+  if (spacer) spacer.style.setProperty('display', show ? 'block' : 'none', 'important');
 }
 
 // ── EVENTI ──
@@ -1466,7 +1463,7 @@ document.getElementById('btnGoogleLogin').addEventListener('click', () => {
 </div>
 
 <!-- BOTTOM TAB BAR -->
-<div id="bottomBar" class="bottom-bar-hidden" style="position:fixed;bottom:0;left:0;right:0;background:#2C1810;border-top:1px solid rgba(255,255,255,0.1);z-index:500;padding:0 0 env(safe-area-inset-bottom) 0">
+<div id="bottomBar" style="position:fixed;bottom:0;left:0;right:0;background:#2C1810;border-top:1px solid rgba(255,255,255,0.1);z-index:500;padding:0 0 env(safe-area-inset-bottom) 0">
   <div style="display:flex;max-width:1100px;margin:0 auto">
     <button id="tabHome" class="tab-btn active-tab">
       <span style="font-size:20px">🏠</span>
