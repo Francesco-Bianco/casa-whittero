@@ -54,7 +54,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
 
-  header { background: #2C1810; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; overflow: hidden; }
+  header { background: #2C1810; display: flex; flex-direction: column; }
 
   .header-title h1 { color: #FDF6EC; font-size: 18px; font-weight: 700; letter-spacing: 0; }
   .header-title .subtitle { color: #F59E0B; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; }
@@ -232,37 +232,34 @@
   <p>Caricamento in corso...</p>
 </div>
 
-<header>
-  <div class="header-title" style="cursor:pointer" id="headerTitleArea" title="Clicca per modificare">
-    <div class="subtitle" id="displaySubtitle">Nome della casa</div>
-    <h1 id="displayTitle" style="display:none"></h1>
-  </div>
-
-  <!-- Inline edit form (hidden by default) -->
-  <div id="editTitleForm" style="display:none;flex-direction:column;gap:6px">
-    <input id="inputSubtitle" placeholder="Nome della casa" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 10px;color:#F59E0B;font-family:Nunito,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;width:180px;outline:none">
-    <input id="inputTitle" style="display:none" placeholder="Es. La mia casa" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 10px;color:#FDF6EC;font-family:Nunito,sans-serif;font-size:18px;font-weight:700;width:180px;outline:none">
-    <div style="display:flex;gap:6px;margin-top:2px">
-      <button id="btnSaveTitle" style="background:#F59E0B;border:none;border-radius:5px;padding:4px 12px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;color:#2C1810;cursor:pointer">✓ Salva</button>
-      <button id="btnCancelTitle" style="background:rgba(255,255,255,0.1);border:none;border-radius:5px;padding:4px 10px;font-family:Nunito,sans-serif;font-size:12px;color:#FDF6EC;cursor:pointer">Annulla</button>
+<header style="flex-direction:column;align-items:stretch;padding:10px 16px 0">
+  <!-- Row 1: title + user info -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div id="headerTitleArea" style="cursor:pointer" title="Clicca per modificare">
+      <div class="subtitle" id="displaySubtitle">Nome della casa</div>
     </div>
-  </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="sync-status"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Connessione...</span></div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <img id="userAvatar" src="" style="width:28px;height:28px;border-radius:50%;display:none;border:2px solid #F59E0B">
-        <span id="userName" style="color:rgba(255,255,255,0.6);font-size:12px"></span>
-        <button id="btnLogout" style="display:none"></button>
+    <div id="editTitleForm" style="display:none;flex-direction:column;gap:4px">
+      <input id="inputSubtitle" placeholder="Nome della casa" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 10px;color:#F59E0B;font-family:Nunito,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;width:160px;outline:none">
+      <input id="inputTitle" style="display:none">
+      <div style="display:flex;gap:6px">
+        <button id="btnSaveTitle" style="background:#F59E0B;border:none;border-radius:5px;padding:4px 12px;font-family:Nunito,sans-serif;font-size:12px;font-weight:700;color:#2C1810;cursor:pointer">✓ Salva</button>
+        <button id="btnCancelTitle" style="background:rgba(255,255,255,0.1);border:none;border-radius:5px;padding:4px 10px;font-family:Nunito,sans-serif;font-size:12px;color:#FDF6EC;cursor:pointer">Annulla</button>
       </div>
     </div>
-    <nav>
-      <button class="active" id="navMenu">📅 Menù</button>
-      <button id="navRicette">📖 Ricette</button>
-      <button id="navSpesa">🛒 Spesa</button>
-      <button id="navTodo">✅ To Do</button>
-    </nav>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="sync-status"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Connessione...</span></div>
+      <img id="userAvatar" src="" style="width:28px;height:28px;border-radius:50%;display:none;border:2px solid #F59E0B">
+      <span id="userName" style="color:rgba(255,255,255,0.6);font-size:12px"></span>
+      <button id="btnLogout" style="display:none"></button>
+    </div>
   </div>
+  <!-- Row 2: full-width nav -->
+  <nav style="width:100%;padding-bottom:10px">
+    <button class="active" id="navMenu">📅 Menù</button>
+    <button id="navRicette">📖 Ricette</button>
+    <button id="navSpesa">🛒 Spesa</button>
+    <button id="navTodo">✅ To Do</button>
+  </nav>
 </header>
 
 <div id="toast"></div>
