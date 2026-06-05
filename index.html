@@ -1403,6 +1403,11 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('btnLogout').style.display = 'block';
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('loadingScreen').style.display = 'flex';
+    // Show bottom bar immediately - don't wait for Firebase
+    const _bar = document.getElementById('bottomBar');
+    const _spacer = document.getElementById('bottomSpacer');
+    if (_bar) { _bar.style.removeProperty('display'); _bar.style.display = 'block'; }
+    if (_spacer) { _spacer.style.removeProperty('display'); _spacer.style.display = 'block'; }
     setSyncStatus('syncing', 'Connessione...');
     loadFromFirebase().then(() => {
       startRealtimeSync();
