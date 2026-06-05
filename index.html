@@ -58,7 +58,7 @@
 
   .header-title h1 { color: #FDF6EC; font-size: 18px; font-weight: 700; letter-spacing: 0; }
   #displaySubtitle { color: #F59E0B; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-family: Nunito, sans-serif; }
-  .sync-status { font-size: 12px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px; }
+  .sync-status { font-size: 11px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
   .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; flex-shrink: 0; }
   .sync-dot.ok { background: #4ade80; }
   .sync-dot.syncing { background: #F59E0B; animation: pulse 1s infinite; }
@@ -237,7 +237,7 @@
     <div id="headerTitleArea" style="cursor:pointer" title="Clicca per modificare">
       <div class="subtitle" id="displaySubtitle">Nome della casa</div>
     </div>
-    <div id="editTitleForm" style="display:none;flex-direction:column;gap:4px">
+    <div id="editTitleForm" style="display:none;gap:4px;flex-direction:column">
       <input id="inputSubtitle" placeholder="Nome della casa" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 10px;color:#F59E0B;font-family:Nunito,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;width:160px;outline:none">
       <input id="inputTitle" style="display:none">
       <div style="display:flex;gap:6px">
@@ -559,10 +559,10 @@ async function save() {
   saveTimer = setTimeout(async () => {
     try {
       await setDoc(doc(db, 'utenti', currentUser.uid), { recipes, menu, spesa, todo, personeMap, houseSubtitle, houseTitle });
-      setSyncStatus('ok', 'Sincronizzato ✓');
+      setSyncStatus('ok', '✓ Sync');
     } catch(e) {
       console.error(e);
-      setSyncStatus('error', 'Errore sync');
+      setSyncStatus('error', '⚠️');
     }
   }, 800);
 }
@@ -599,10 +599,10 @@ async function loadFromFirebase() {
       houseTitle = 'La mia casa';
       await save();
     }
-    setSyncStatus('ok', 'Sincronizzato ✓');
+    setSyncStatus('ok', '✓ Sync');
   } catch(e) {
     console.error(e);
-    setSyncStatus('error', 'Errore connessione');
+    setSyncStatus('error', '⚠️');
     // Fallback to localStorage
     recipes = JSON.parse(localStorage.getItem('cucina_recipes') || 'null') || DEFAULT_RECIPES;
     menu = JSON.parse(localStorage.getItem('cucina_menu') || 'null') || makeEmptyMenu();
@@ -623,7 +623,7 @@ function startRealtimeSync() {
     menu = data.menu || makeEmptyMenu();
     spesa = data.spesa || [];
     personeMap = data.personeMap || {};
-    setSyncStatus('ok', 'Sincronizzato ✓');
+    setSyncStatus('ok', '✓ Sync');
     // Re-render current view
     const active = document.querySelector('.view.active');
     if (active) {
@@ -634,7 +634,7 @@ function startRealtimeSync() {
     }
   }, (err) => {
     console.error(err);
-    setSyncStatus('error', 'Errore connessione');
+    setSyncStatus('error', '⚠️');
   });
 }
 
@@ -1247,13 +1247,21 @@ function saveTitleEdit() {
   houseTitle = document.getElementById('inputTitle').value.trim() || 'La mia casa';
   document.getElementById('displaySubtitle').textContent = houseSubtitle;
   document.getElementById('displayTitle').textContent = houseTitle;
-  document.getElementById('editTitleForm').style.display = 'none';
-  document.getElementById('headerTitleArea').style.display = 'block';
+  const etf = document.getElementById('editTitleForm');
+  etf.style.display = 'none';
+  etf.style.flexDirection = '';
+  const hta = document.getElementById('headerTitleArea');
+  hta.style.display = '';
+  hta.style.removeProperty('display');
   save();
 }
 function cancelTitleEdit() {
-  document.getElementById('editTitleForm').style.display = 'none';
-  document.getElementById('headerTitleArea').style.display = 'block';
+  const etf = document.getElementById('editTitleForm');
+  etf.style.display = 'none';
+  etf.style.flexDirection = '';
+  const hta = document.getElementById('headerTitleArea');
+  hta.style.display = '';
+  hta.style.removeProperty('display');
 }
 
 
@@ -1408,7 +1416,7 @@ onAuthStateChanged(auth, (user) => {
     const _spacer = document.getElementById('bottomSpacer');
     if (_bar) { _bar.style.removeProperty('display'); _bar.style.display = 'block'; }
     if (_spacer) { _spacer.style.removeProperty('display'); _spacer.style.display = 'block'; }
-    setSyncStatus('syncing', 'Connessione...');
+    setSyncStatus('syncing', '...');
     loadFromFirebase().then(() => {
       startRealtimeSync();
       loadTitle();
