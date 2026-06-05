@@ -58,6 +58,7 @@
 
   .header-title h1 { color: #FDF6EC; font-size: 18px; font-weight: 700; letter-spacing: 0; }
   #displaySubtitle { color: #F59E0B; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-family: Nunito, sans-serif; }
+  .title-hidden { visibility: hidden; height: 0; overflow: hidden; pointer-events: none; }
   .sync-status { font-size: 11px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
   .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; flex-shrink: 0; }
   .sync-dot.ok { background: #4ade80; }
@@ -1233,27 +1234,29 @@ function toggleTheme() {
 // ── TITOLO PERSONALIZZATO ──
 function loadTitle() {
   document.getElementById('displaySubtitle').textContent = houseSubtitle;
-  document.getElementById('displayTitle').textContent = houseTitle;
 }
 function openTitleEdit() {
   document.getElementById('inputSubtitle').value = houseSubtitle;
-  document.getElementById('inputTitle').value = houseTitle;
-  document.getElementById('headerTitleArea').style.display = 'none';
+  document.getElementById('headerTitleArea').classList.add('title-hidden');
+  document.getElementById('editTitleForm').classList.remove('title-hidden');
   document.getElementById('editTitleForm').style.display = 'flex';
-  document.getElementById('inputTitle').focus();
+  setTimeout(() => document.getElementById('inputSubtitle').focus(), 50);
+}
+function closeTitleEdit() {
+  document.getElementById('editTitleForm').style.display = 'none';
+  document.getElementById('editTitleForm').classList.add('title-hidden');
+  document.getElementById('headerTitleArea').classList.remove('title-hidden');
 }
 function saveTitleEdit() {
   houseSubtitle = document.getElementById('inputSubtitle').value.trim() || 'Nome della casa';
-  houseTitle = document.getElementById('inputTitle').value.trim() || 'La mia casa';
+  houseTitle = houseSubtitle;
   document.getElementById('displaySubtitle').textContent = houseSubtitle;
-  document.getElementById('displayTitle').textContent = houseTitle;
-  document.getElementById('editTitleForm').style.cssText = 'display:none;flex-direction:column;gap:4px';
-  document.getElementById('headerTitleArea').style.cssText = 'cursor:pointer;display:block';
+  closeTitleEdit();
   save();
+  showToast('Nome salvato!');
 }
 function cancelTitleEdit() {
-  document.getElementById('editTitleForm').style.cssText = 'display:none;flex-direction:column;gap:4px';
-  document.getElementById('headerTitleArea').style.cssText = 'cursor:pointer;display:block';
+  closeTitleEdit();
 }
 
 
