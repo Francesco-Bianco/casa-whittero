@@ -1247,21 +1247,13 @@ function saveTitleEdit() {
   houseTitle = document.getElementById('inputTitle').value.trim() || 'La mia casa';
   document.getElementById('displaySubtitle').textContent = houseSubtitle;
   document.getElementById('displayTitle').textContent = houseTitle;
-  const etf = document.getElementById('editTitleForm');
-  etf.style.display = 'none';
-  etf.style.flexDirection = '';
-  const hta = document.getElementById('headerTitleArea');
-  hta.style.display = '';
-  hta.style.removeProperty('display');
+  document.getElementById('editTitleForm').style.cssText = 'display:none;flex-direction:column;gap:4px';
+  document.getElementById('headerTitleArea').style.cssText = 'cursor:pointer;display:block';
   save();
 }
 function cancelTitleEdit() {
-  const etf = document.getElementById('editTitleForm');
-  etf.style.display = 'none';
-  etf.style.flexDirection = '';
-  const hta = document.getElementById('headerTitleArea');
-  hta.style.display = '';
-  hta.style.removeProperty('display');
+  document.getElementById('editTitleForm').style.cssText = 'display:none;flex-direction:column;gap:4px';
+  document.getElementById('headerTitleArea').style.cssText = 'cursor:pointer;display:block';
 }
 
 
